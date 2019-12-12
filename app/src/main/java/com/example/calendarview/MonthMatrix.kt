@@ -1,19 +1,18 @@
 package com.example.calendarview
 
-class MonthMatrix(
-    val month: Int,
-    val year: Int
-) {
+class MonthMatrix(private val monthData: MonthData) {
+
+    constructor(month: Int, year: Int) : this(MonthData(month, year))
 
     val length: Int
-        get() = CalendarAPI.getWeeksCount(month, year)
+        get() = CalendarAPI.getWeeksCount(monthData.month, monthData.year)
 
     private val firstInd: Int
-        get() = CalendarAPI.getFirstWeekDayOfMonth(month, year) - 1
+        get() = CalendarAPI.getFirstWeekDayOfMonth(monthData.month, monthData.year) - 1
 
     private val lastInd: Int
         get() {
-            val lastWeekDay = CalendarAPI.getLastWeekDayOfMonth(month, year) - 1
+            val lastWeekDay = CalendarAPI.getLastWeekDayOfMonth(monthData.month, monthData.year) - 1
             return DATE_ROW_LEN * (length - 1) + lastWeekDay
         }
 

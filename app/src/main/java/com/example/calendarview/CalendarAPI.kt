@@ -34,6 +34,14 @@ object CalendarAPI {
         return calendar.getActualMaximum(Calendar.WEEK_OF_MONTH)
     }
 
+    fun getMonthName(month: Int): String {
+        return Calendar.getInstance().run {
+            clearTime()
+            set(Calendar.MONTH, month)
+            getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())?:""
+        }
+    }
+
 }
 
 fun Calendar.clearTime() {
