@@ -33,11 +33,21 @@ class CalendarView : LinearLayout {
         orientation = VERTICAL
         View.inflate(context, R.layout.layout_calendar_view, this)
         pagerMonth.addOnPageChangeListener(monthChangeListener)
-        setMonthTitle(0)
+        setMonth(CalendarAPI.getCurrentMonthData())
+    }
+
+    private fun setMonth(monthData: MonthData) {
+        val positionForMonth = pagerMonth.getMonthAdapter().getPosition(monthData)
+        pagerMonth.currentItem = positionForMonth
+        setMonthTitle(monthData)
     }
 
     private fun setMonthTitle(position: Int) {
         val monthData = pagerMonth.getMonthAdapter().getMonthData(position)
+        setMonthTitle(monthData)
+    }
+
+    private fun setMonthTitle(monthData: MonthData) {
         val monthName = CalendarAPI.getMonthName(monthData.month)
         tvMonthTitle.text = monthName
     }

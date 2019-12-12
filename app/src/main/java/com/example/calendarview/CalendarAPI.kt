@@ -42,6 +42,13 @@ object CalendarAPI {
         }
     }
 
+    fun getCurrentMonthData(): MonthData {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        return MonthData(month, year)
+    }
+
 }
 
 fun Calendar.clearTime() {

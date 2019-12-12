@@ -13,11 +13,6 @@ class MonthAdapter: PagerAdapter() {
         return monthView
     }
 
-    internal fun getMonthData(position: Int): MonthData {
-        val calendarMonth = position % 12
-        return MonthData(calendarMonth, 2020)
-    }
-
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view == `object`
     }
@@ -27,7 +22,17 @@ class MonthAdapter: PagerAdapter() {
     }
 
     override fun getCount(): Int {
-        return 12
+        return Int.MAX_VALUE
+    }
+
+    internal fun getMonthData(position: Int): MonthData {
+        val calendarMonth = position % 12
+        val year = (position / 12) + 1
+        return MonthData(calendarMonth, year)
+    }
+
+    internal fun getPosition(monthData: MonthData): Int {
+        return (monthData.year - 1) * 12 + monthData.month
     }
 
 }
