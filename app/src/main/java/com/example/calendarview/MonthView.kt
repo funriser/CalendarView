@@ -3,8 +3,10 @@ package com.example.calendarview
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import java.util.*
+import kotlin.math.min
 
 class MonthView: View {
 
@@ -12,11 +14,26 @@ class MonthView: View {
     private var currentCells: List<List<DateCell?>> = emptyList()
 
     private val textColor = Color.BLACK
+    private val textColorSelected = Color.WHITE
+    private val selectionColor = Color.GREEN
+
+    private var selectedDate: DateCell? = null
 
     private val paintDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = textColor
         textSize = 40f
     }
+
+    private val paintSelectedDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = textColorSelected
+        textSize = 40f
+    }
+
+    private val paintCellSelection = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = selectionColor
+    }
+
+    internal var onDateSelected: ((Date) -> Unit)? = null
 
     constructor(ctx: Context) : super(ctx)
 
@@ -36,20 +53,77 @@ class MonthView: View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         canvas?:return
+        forEachCell { dateCell ->
+            dateCell?:return@forEachCell
+            if (!dateCell.isSelected) {
+                drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintDateText)
+            } else {
+                drawCircleInsideRectangle(canvas, dateCell.rect, paintCellSelection)
+                drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintSelectedDateText)
+            }
+        }
+    }
+
+    private fun drawTextInsideRect(
+        c: Canvas, text: String,
+        rect: RectF, paint: Paint
+    ) {
+        paint.getTextBounds(text, 0, text.length, textRect)
+
+        val centerX = rect.left + rect.width() / 2
+        val centerY = rect.top + rect.height() / 2
+
+        val textX = centerX - textRect.width() / 2 - textRect.left
+        val textY = centerY + textRect.height() / 2 - textRect.bottom
+
+        c.drawText(text, textX, textY, paint)
+    }
+
+    private fun drawCircleInsideRectangle(c: Canvas, rect: RectF, paint: Paint) {
+        val cx = (rect.left + rect.right) / 2 //average
+        val cy = (rect.top + rect.bottom) / 2 //average
+        val radius = min(rect.width(), rect.height()) / 2
+        c.drawCircle(cx, cy, radius, paint)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        event?:return super.onTouchEvent(event)
+        when(event.action) {
+            MotionEvent.ACTION_UP -> {
+                if (currentCells.isEmpty()) {
+                    return false
+                }
+                forEachCell { dateCell ->
+                    dateCell?:return@forEachCell
+                    if (dateCell.isPointInside(event.x, event.y)) {
+                        onCellTouched(dateCell)
+                        return true
+                    }
+                }
+                return false
+            }
+            MotionEvent.ACTION_DOWN -> {
+                return true
+            }
+            else -> {
+                return super.onTouchEvent(event)
+            }
+        }
+    }
+
+    private fun onCellTouched(dateCell: DateCell) {
+        dateCell.isSelected = true
+        selectedDate?.isSelected = false
+        selectedDate = dateCell
+        val selectedDate = CalendarAPI.getDate(dateMatrix.monthData, dateCell.number)
+        onDateSelected?.invoke(selectedDate)
+        invalidate()
+    }
+
+    private inline fun forEachCell(action: (DateCell?) -> Unit) {
         currentCells.forEach { cellRow ->
             cellRow.forEach cell@ {  dateCell ->
-                dateCell?:return@cell
-
-                val dateText = dateCell.number.toString()
-                paintDateText.getTextBounds(dateText, 0, dateText.length, textRect)
-
-                val centerX = dateCell.rect.left + dateCell.rect.width() / 2
-                val centerY = dateCell.rect.top + dateCell.rect.height() / 2
-
-                val textX = centerX - textRect.width() / 2 - textRect.left
-                val textY = centerY - textRect.height() / 2 - textRect.bottom
-
-                canvas.drawText(dateCell.number.toString(), textX, textY, paintDateText)
+                action.invoke(dateCell)
             }
         }
     }

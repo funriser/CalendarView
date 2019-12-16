@@ -49,6 +49,15 @@ object CalendarAPI {
         return MonthData(month, year)
     }
 
+    fun getDate(monthData: MonthData, day: Int): Date {
+        return Calendar.getInstance().apply {
+            clearTime()
+            set(Calendar.DAY_OF_MONTH, day)
+            set(Calendar.MONTH, monthData.month)
+            set(Calendar.YEAR, monthData.year)
+        }.time
+    }
+
 }
 
 fun Calendar.clearTime() {

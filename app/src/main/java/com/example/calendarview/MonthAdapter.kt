@@ -3,12 +3,17 @@ package com.example.calendarview
 import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
+import java.util.*
 
 class MonthAdapter: PagerAdapter() {
 
+    var onDateSelected: ((Date) -> Unit)? = null
+
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val monthData = getMonthData(position)
-        val monthView = MonthView(container.context, monthData)
+        val monthView = MonthView(container.context, monthData).apply {
+            onDateSelected = this@MonthAdapter.onDateSelected
+        }
         container.addView(monthView)
         return monthView
     }
@@ -18,7 +23,9 @@ class MonthAdapter: PagerAdapter() {
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        container.removeView(`object` as View)
+        val monthView = `object` as MonthView
+        monthView.onDateSelected = null
+        container.removeView(monthView)
     }
 
     override fun getCount(): Int {

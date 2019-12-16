@@ -6,8 +6,15 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.layout_calendar_view.view.*
+import java.util.*
 
 class CalendarView : LinearLayout {
+
+    var onDateSelected: ((Date) -> Unit)? = null
+        set(value) {
+            field = value
+            pagerMonth.getMonthAdapter().onDateSelected = value
+        }
 
     private val monthChangeListener = object : ViewPager.OnPageChangeListener {
 

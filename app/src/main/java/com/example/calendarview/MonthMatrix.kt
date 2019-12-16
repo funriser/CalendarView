@@ -1,6 +1,6 @@
 package com.example.calendarview
 
-class MonthMatrix(private val monthData: MonthData) {
+class MonthMatrix(internal val monthData: MonthData) {
 
     constructor(month: Int, year: Int) : this(MonthData(month, year))
 
