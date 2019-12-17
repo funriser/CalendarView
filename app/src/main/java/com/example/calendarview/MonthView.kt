@@ -16,6 +16,7 @@ class MonthView: View {
     private val textColor = Color.BLACK
     private val textColorSelected = Color.WHITE
     private val selectionColor = Color.GREEN
+    private val highlightColor = Color.GRAY
 
     private var selectedDate: DateCell? = null
 
@@ -33,7 +34,18 @@ class MonthView: View {
         color = selectionColor
     }
 
+    private val paintCellHighlight = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = highlightColor
+    }
+
     internal var onDateSelected: ((Date) -> Unit)? = null
+    internal var highLightedDates: List<Date>? = null
+        set(value) {
+            field = value
+            if (currentCells.isNotEmpty() && value != null) {
+                applyHighlightedDates(value)
+            }
+        }
 
     constructor(ctx: Context) : super(ctx)
 
@@ -46,6 +58,9 @@ class MonthView: View {
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         currentCells = getCurrentCells(w, h)
+        highLightedDates?.let {
+            applyHighlightedDates(it)
+        }
     }
 
     private val textRect = Rect()
@@ -56,8 +71,15 @@ class MonthView: View {
         forEachCell { dateCell ->
             dateCell?:return@forEachCell
             if (!dateCell.isSelected) {
-                drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintDateText)
+                if (!dateCell.isHighlighted) {
+                    drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintDateText)
+                } else {
+                    //if highlighted
+                    drawCircleInsideRectangle(canvas, dateCell.rect, paintCellHighlight)
+                    drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintSelectedDateText)
+                }
             } else {
+                //if selected
                 drawCircleInsideRectangle(canvas, dateCell.rect, paintCellSelection)
                 drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintSelectedDateText)
             }
@@ -155,6 +177,19 @@ class MonthView: View {
             currY += cellHeight
             return@List dateRow
         }
+    }
+
+    private fun applyHighlightedDates(dates: List<Date>) {
+        forEachCell { dateCell ->
+            dateCell?:return@forEachCell
+            dates.forEach {
+                val dayOfMonth = DayOfMonthData(dateMatrix.monthData, dateCell.number)
+                if (CalendarAPI.isDateMatching(it, dayOfMonth)) {
+                    dateCell.isHighlighted = true
+                }
+            }
+        }
+        invalidate()
     }
 
 }

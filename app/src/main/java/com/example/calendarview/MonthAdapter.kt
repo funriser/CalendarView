@@ -9,9 +9,17 @@ class MonthAdapter: PagerAdapter() {
 
     var onDateSelected: ((Date) -> Unit)? = null
 
+    var highlightedDates: List<Date>? = null
+
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val monthData = getMonthData(position)
         val monthView = MonthView(container.context, monthData).apply {
+            highlightedDates?.let {
+                val filteredDates = CalendarAPI.filterByMonth(it, monthData)
+                if (filteredDates.isNotEmpty()) {
+                    this.highLightedDates = filteredDates
+                }
+            }
             onDateSelected = this@MonthAdapter.onDateSelected
         }
         container.addView(monthView)

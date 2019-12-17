@@ -15,7 +15,16 @@ class MainActivity : AppCompatActivity() {
         vCalendar.onDateSelected = {
             tvSelectedDate.text = formatDate(it)
         }
+        vCalendar.highlightedDates = datesToHighlight
     }
+
+    private val datesToHighlight = listOf(
+        CalendarAPI.getDate(MonthData(11, 2019),1),
+        CalendarAPI.getDate(MonthData(0, 2020), 1),
+        CalendarAPI.getDate(MonthData(0, 2020), 2),
+        CalendarAPI.getDate(MonthData(0, 2020), 3),
+        CalendarAPI.getDate(MonthData(0, 2020), 4)
+    )
 
     private fun formatDate(date: Date): String {
         return SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault()).format(date)

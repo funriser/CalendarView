@@ -16,6 +16,12 @@ class CalendarView : LinearLayout {
             pagerMonth.getMonthAdapter().onDateSelected = value
         }
 
+    var highlightedDates: List<Date>? = null
+        set(value) {
+            field = value
+            pagerMonth.getMonthAdapter().highlightedDates = value
+        }
+
     private val monthChangeListener = object : ViewPager.OnPageChangeListener {
 
         override fun onPageScrollStateChanged(state: Int) {
