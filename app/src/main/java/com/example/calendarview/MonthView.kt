@@ -207,6 +207,9 @@ class MonthView: View {
     }
 
     private fun onCellTouched(dateCell: DateCell) {
+        if (dateCell == selectedDate) {
+            return
+        }
         dateCell.isSelected = true
         selectedDate?.isSelected = false
         selectedDate = dateCell
