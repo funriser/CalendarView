@@ -1,8 +1,12 @@
 package com.example.calendarview
 
+import java.text.SimpleDateFormat
 import java.util.*
 
 object CalendarAPI {
+
+    private const val FORMAT_MONTH_LONG = "MMMM"
+    private const val FORMAT_WEEK_DAY_SHORT = "E"
 
     fun getFirstWeekDayOfMonth(month: Int, year: Int): Int {
         val calendar = Calendar.getInstance().apply {
@@ -35,11 +39,20 @@ object CalendarAPI {
     }
 
     fun getMonthName(month: Int): String {
-        return Calendar.getInstance().run {
+        val date = Calendar.getInstance().apply {
             clearTime()
             set(Calendar.MONTH, month)
-            getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())?:""
-        }
+        }.time
+        return SimpleDateFormat(FORMAT_MONTH_LONG, Locale.getDefault()).format(date)
+    }
+
+    //takes params from 0 to 6
+    fun getWeekDayShortName(weekDay: Int): String {
+        val date = Calendar.getInstance().apply {
+            clearTime()
+            set(Calendar.DAY_OF_WEEK, weekDay + 1)
+        }.time
+        return SimpleDateFormat(FORMAT_WEEK_DAY_SHORT, Locale.getDefault()).format(date)
     }
 
     fun getCurrentMonthData(): MonthData {

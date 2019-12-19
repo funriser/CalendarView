@@ -12,11 +12,15 @@ class MonthView: View {
 
     private var dateMatrix = MonthMatrix(Calendar.JULY,2019)
     private var currentCells: List<List<DateCell?>> = emptyList()
+    private var weekDayTitleCells: List<WeekDayCell> = emptyList()
 
     private val textColor = Color.BLACK
     private val textColorSelected = Color.WHITE
     private val selectionColor = Color.GREEN
     private val highlightColor = Color.GRAY
+    private val weekDayTitleColor = Color.GREEN
+
+    private var mrgWeekDayTitle = 15
 
     private var selectedDate: DateCell? = null
 
@@ -38,6 +42,13 @@ class MonthView: View {
         color = highlightColor
     }
 
+    private val paintWeekDayTitle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = weekDayTitleColor
+        textSize = 35f
+    }
+
+    private val textRectBuf = Rect()
+
     internal var onDateSelected: ((Date) -> Unit)? = null
     internal var highLightedDates: List<Date>? = null
         set(value) {
@@ -57,17 +68,25 @@ class MonthView: View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        currentCells = getCurrentCells(w, h)
+        val weekDayTitleHeight = getWeekDateTitlesHeight()
+        weekDayTitleCells = getWeekDaysTitleCells(w, weekDayTitleHeight)
+        currentCells = getCurrentCells(
+            startX = 0f,
+            startY = weekDayTitleHeight.toFloat(),
+            width = w,
+            height = h - weekDayTitleHeight
+        )
         highLightedDates?.let {
             applyHighlightedDates(it)
         }
     }
 
-    private val textRect = Rect()
-
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         canvas?:return
+        weekDayTitleCells.forEach {
+            drawTextInsideRect(canvas, it.name, it.rect, paintWeekDayTitle)
+        }
         forEachCell { dateCell ->
             dateCell?:return@forEachCell
             if (!dateCell.isSelected) {
@@ -90,13 +109,13 @@ class MonthView: View {
         c: Canvas, text: String,
         rect: RectF, paint: Paint
     ) {
-        paint.getTextBounds(text, 0, text.length, textRect)
+        measureText(text, paint, textRectBuf)
 
         val centerX = rect.left + rect.width() / 2
         val centerY = rect.top + rect.height() / 2
 
-        val textX = centerX - textRect.width() / 2 - textRect.left
-        val textY = centerY + textRect.height() / 2 - textRect.bottom
+        val textX = centerX - textRectBuf.width() / 2 - textRectBuf.left
+        val textY = centerY + textRectBuf.height() / 2 - textRectBuf.bottom
 
         c.drawText(text, textX, textY, paint)
     }
@@ -150,10 +169,13 @@ class MonthView: View {
         }
     }
 
-    private fun getCurrentCells(width: Int, height: Int): List<List<DateCell?>> {
+    private fun getCurrentCells(
+        startX: Float, startY: Float,
+        width: Int, height: Int
+    ): List<List<DateCell?>> {
         var dateNumber = 1
-        var currX = 0f
-        var currY = 0f
+        var currX = startX
+        var currY = startY
         val cellWidth = width.toFloat() / MonthMatrix.DATE_ROW_LEN
         val cellHeight = height.toFloat() / dateMatrix.length
 
@@ -179,6 +201,28 @@ class MonthView: View {
         }
     }
 
+    private fun getWeekDaysTitleCells(width: Int, textHeight: Int): List<WeekDayCell> {
+        val cellWidth = width.toFloat() / MonthMatrix.DATE_ROW_LEN
+        var currX = 0f
+        val t = 0f
+        val b = t + textHeight
+        return List(MonthMatrix.DATE_ROW_LEN) {
+            val l = currX
+            val r = currX + cellWidth
+            currX += cellWidth
+            val weekDayTitle = CalendarAPI.getWeekDayShortName(it)
+            val weekDayTitleRect = RectF(l, t, r, b)
+            return@List WeekDayCell(weekDayTitle, weekDayTitleRect)
+        }
+    }
+
+    private fun getWeekDateTitlesHeight(): Int {
+        val weekDayTextSample = CalendarAPI.getWeekDayShortName(0) //get localed week day text sample
+        val textRect = Rect()
+        measureText(weekDayTextSample, paintWeekDayTitle, textRect)
+        return textRect.height() + mrgWeekDayTitle * 2
+    }
+
     private fun applyHighlightedDates(dates: List<Date>) {
         forEachCell { dateCell ->
             dateCell?:return@forEachCell
@@ -190,6 +234,10 @@ class MonthView: View {
             }
         }
         invalidate()
+    }
+
+    private fun measureText(text: String, paint: Paint, rect: Rect) {
+        paint.getTextBounds(text, 0, text.length, rect)
     }
 
 }
