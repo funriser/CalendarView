@@ -1,11 +1,12 @@
 package com.example.calendarview
 
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import java.util.*
 
-class MonthAdapter: PagerAdapter() {
+class MonthAdapter(private val monthOwner: MonthOwner): PagerAdapter() {
 
     var onDateSelected: ((Date) -> Unit)? = null
 
@@ -13,7 +14,7 @@ class MonthAdapter: PagerAdapter() {
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val monthData = getMonthData(position)
-        val monthView = MonthView(container.context, monthData).apply {
+        val monthView = monthOwner.onCreateMonthView(container.context, monthData).apply {
             highlightedDates?.let {
                 val filteredDates = CalendarAPI.filterByMonth(it, monthData)
                 if (filteredDates.isNotEmpty()) {
@@ -48,6 +49,12 @@ class MonthAdapter: PagerAdapter() {
 
     internal fun getPosition(monthData: MonthData): Int {
         return (monthData.year - 1) * 12 + monthData.month
+    }
+
+    interface MonthOwner {
+
+        fun onCreateMonthView(context: Context, monthData: MonthData): MonthView
+
     }
 
 }

@@ -10,42 +10,41 @@ import kotlin.math.min
 
 class MonthView: View {
 
+    companion object {
+
+        internal const val defaultTextColor = Color.BLACK
+        internal const val defaultTextColorSelected = Color.WHITE
+        internal const val defaultSelectionColor = Color.GREEN
+        internal const val defaultHighlightColor = Color.GRAY
+        internal const val defaultWeekdayTitleColor = Color.GREEN
+        internal const val defaultMrgWeekDayTitle = 15
+        internal const val defaultTextDaySize = 40f
+        internal const val defaultPaddingSelection = 10
+
+    }
+
     private var dateMatrix = MonthMatrix(Calendar.JULY,2019)
     private var currentCells: List<List<DateCell?>> = emptyList()
     private var weekDayTitleCells: List<WeekDayCell> = emptyList()
 
-    private val textColor = Color.BLACK
-    private val textColorSelected = Color.WHITE
-    private val selectionColor = Color.GREEN
-    private val highlightColor = Color.GRAY
-    private val weekDayTitleColor = Color.GREEN
+    private var textColor = defaultTextColor
+    private var textColorSelected = defaultTextColorSelected
+    private var selectionColor = defaultSelectionColor
+    private var highlightColor = defaultHighlightColor
+    private var weekDayTitleColor = defaultWeekdayTitleColor
 
-    private var mrgWeekDayTitle = 15
+    private var mrgWeekDayTitle = defaultMrgWeekDayTitle
+    private var paddingSelection = defaultPaddingSelection
+
+    private var textDaySize = defaultTextDaySize
 
     private var selectedDate: DateCell? = null
 
-    private val paintDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = textColor
-        textSize = 40f
-    }
-
-    private val paintSelectedDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = textColorSelected
-        textSize = 40f
-    }
-
-    private val paintCellSelection = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = selectionColor
-    }
-
-    private val paintCellHighlight = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = highlightColor
-    }
-
-    private val paintWeekDayTitle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = weekDayTitleColor
-        textSize = 35f
-    }
+    private lateinit var paintDateText: Paint
+    private lateinit var paintSelectedDateText: Paint
+    private lateinit var paintCellSelection: Paint
+    private lateinit var paintCellHighlight: Paint
+    private lateinit var paintWeekDayTitle: Paint
 
     private val textRectBuf = Rect()
 
@@ -58,12 +57,53 @@ class MonthView: View {
             }
         }
 
-    constructor(ctx: Context) : super(ctx)
+    constructor(ctx: Context) : super(ctx) {
+        init()
+    }
 
-    constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs)
+    constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs) {
+        init()
+    }
 
     constructor(ctx: Context, monthData: MonthData): super(ctx) {
         dateMatrix = MonthMatrix(monthData)
+        init()
+    }
+
+    constructor(ctx: Context, params: Params, monthData: MonthData): super(ctx) {
+        dateMatrix = MonthMatrix(monthData)
+        params.let {
+            textColor = it.textColor
+            textColorSelected = it.textColorSelected
+            selectionColor = it.selectionColor
+            highlightColor = it.highlightColor
+            weekDayTitleColor = it.weekDayTitleColor
+            mrgWeekDayTitle = it.mrgWeekDayTitle
+            textDaySize = it.textDaySize
+            paddingSelection = it.paddingSelection
+        }
+        init()
+    }
+
+    private fun init() {
+        paintDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = textColor
+            this.textSize = textDaySize
+        }
+        paintSelectedDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = textColorSelected
+            this.textSize = textDaySize
+        }
+        paintCellSelection = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = selectionColor
+        }
+        paintCellHighlight = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = highlightColor
+        }
+        paintWeekDayTitle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = weekDayTitleColor
+            this.textSize = 35f
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -85,7 +125,7 @@ class MonthView: View {
         super.onDraw(canvas)
         canvas?:return
         weekDayTitleCells.forEach {
-            drawTextInsideRect(canvas, it.name, it.rect, paintWeekDayTitle)
+            drawTextInsideRectTopAlign(canvas, it.name, it.rect, paintWeekDayTitle)
         }
         forEachCell { dateCell ->
             dateCell?:return@forEachCell
@@ -94,12 +134,12 @@ class MonthView: View {
                     drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintDateText)
                 } else {
                     //if highlighted
-                    drawCircleInsideRectangle(canvas, dateCell.rect, paintCellHighlight)
+                    drawCircleInsideRectangle(canvas, dateCell.rect, paintCellHighlight, paddingSelection)
                     drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintSelectedDateText)
                 }
             } else {
                 //if selected
-                drawCircleInsideRectangle(canvas, dateCell.rect, paintCellSelection)
+                drawCircleInsideRectangle(canvas, dateCell.rect, paintCellSelection, paddingSelection)
                 drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintSelectedDateText)
             }
         }
@@ -120,10 +160,24 @@ class MonthView: View {
         c.drawText(text, textX, textY, paint)
     }
 
-    private fun drawCircleInsideRectangle(c: Canvas, rect: RectF, paint: Paint) {
+    private fun drawTextInsideRectTopAlign(
+        c: Canvas, text: String,
+        rect: RectF, paint: Paint
+    ) {
+        measureText(text, paint, textRectBuf)
+
+        val centerX = rect.left + rect.width() / 2
+
+        val textX = centerX - textRectBuf.width() / 2 - textRectBuf.left
+        val textY = rect.top + textRectBuf.height() - textRectBuf.bottom
+
+        c.drawText(text, textX, textY, paint)
+    }
+
+    private fun drawCircleInsideRectangle(c: Canvas, rect: RectF, paint: Paint, padding: Int = 0) {
         val cx = (rect.left + rect.right) / 2 //average
         val cy = (rect.top + rect.bottom) / 2 //average
-        val radius = min(rect.width(), rect.height()) / 2
+        val radius = (min(rect.width(), rect.height()) / 2) - padding
         c.drawCircle(cx, cy, radius, paint)
     }
 
@@ -220,7 +274,7 @@ class MonthView: View {
         val weekDayTextSample = CalendarAPI.getWeekDayShortName(0) //get localed week day text sample
         val textRect = Rect()
         measureText(weekDayTextSample, paintWeekDayTitle, textRect)
-        return textRect.height() + mrgWeekDayTitle * 2
+        return textRect.height() + mrgWeekDayTitle
     }
 
     private fun applyHighlightedDates(dates: List<Date>) {
@@ -239,5 +293,16 @@ class MonthView: View {
     private fun measureText(text: String, paint: Paint, rect: Rect) {
         paint.getTextBounds(text, 0, text.length, rect)
     }
+
+    class Params(
+        internal val textColor: Int,
+        internal val textColorSelected: Int,
+        internal val selectionColor: Int,
+        internal val highlightColor: Int,
+        internal val weekDayTitleColor: Int,
+        internal var mrgWeekDayTitle: Int,
+        internal var textDaySize: Float,
+        internal var paddingSelection: Int
+    )
 
 }

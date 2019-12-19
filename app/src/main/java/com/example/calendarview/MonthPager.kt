@@ -10,12 +10,4 @@ class MonthPager: ViewPager {
 
     constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs)
 
-    init {
-        adapter = MonthAdapter()
-    }
-
-    fun getMonthAdapter(): MonthAdapter {
-        return adapter as MonthAdapter
-    }
-
 }
