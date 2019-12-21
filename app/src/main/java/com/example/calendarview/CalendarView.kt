@@ -6,6 +6,10 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.marginBottom
+import androidx.core.view.marginEnd
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
 import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.layout_calendar_view.view.*
 import java.util.*
@@ -117,6 +121,84 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
         } else {
             MonthView(context, monthViewParams!!, monthData)
         }
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+
+        val pagerMonthLp = pagerMonth.layoutParams
+        pagerMonthLp.width = if (isExactMeasureMode(widthMode)) {
+            getExactPagerDimension(width)
+        } else {
+            //need to include margins for at_most measurement
+            val pagerMrgWidth = width - marginStart - marginEnd
+            if (isExactMeasureMode(heightMode)) {
+                //calculate based on height
+                getPagerWidth(pagerMrgWidth, height)
+            } else {
+                getExactPagerDimension(pagerMrgWidth)
+            }
+        }
+
+        val pagerMonthAvailableHeight = getPagerAvailableHeight(width, height)
+        pagerMonthLp.height = if (isExactMeasureMode(heightMode)) {
+            getExactPagerDimension(pagerMonthAvailableHeight)
+        } else {
+            //need to include margins for at_most measurement
+            val pagerMrgHeight = pagerMonthAvailableHeight - marginTop - marginBottom
+            getPagerHeight(pagerMrgHeight, pagerMonthLp.width)
+        }
+        pagerMonth.layoutParams = pagerMonthLp
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
+    private fun isExactMeasureMode(mode: Int): Boolean {
+        return mode == MeasureSpec.EXACTLY
+    }
+
+    /**
+     * Takes the text view on top into account
+     */
+    private fun getPagerAvailableHeight(parentWidth: Int, parentHeight: Int): Int {
+        val tvWidthSpec = MeasureSpec.makeMeasureSpec(parentWidth, MeasureSpec.AT_MOST)
+        val tvHeightSpec = MeasureSpec.makeMeasureSpec(parentHeight, MeasureSpec.AT_MOST)
+        tvMonthTitle.measure(tvWidthSpec, tvHeightSpec)
+        return parentHeight - tvMonthTitle.measuredHeight - textMonthMargin
+    }
+
+    private fun getExactPagerDimension(availableDimension: Int): Int {
+        return availableDimension
+    }
+
+    private fun getPagerWidth(availableWidth: Int, height: Int): Int {
+        val desiredWidth = (height / MONTH_PAGER_RATIO).toInt()
+        return if (availableWidth >= desiredWidth) {
+            desiredWidth
+        } else {
+            availableWidth
+        }
+    }
+
+    private fun getPagerHeight(availableHeight: Int, width: Int): Int {
+        val desiredHeight = (width * MONTH_PAGER_RATIO).toInt()
+        return if (availableHeight >= desiredHeight) {
+            desiredHeight
+        } else {
+            //horizontal layout?
+            availableHeight / 3
+        }
+    }
+
+    companion object {
+
+        //height to width ratio
+        const val MONTH_PAGER_RATIO = 0.6
+
     }
 
 }
