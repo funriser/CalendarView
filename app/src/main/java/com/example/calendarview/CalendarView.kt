@@ -225,6 +225,11 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
         }
     }
 
+    fun setMonth(month: Int, year: Int) {
+        val monthData = MonthData(month, year)
+        setMonth(monthData)
+    }
+
     fun setTextMonthSize(textMonthSize: Float) {
         this.textMonthSize = textMonthSize
         invalidate()
