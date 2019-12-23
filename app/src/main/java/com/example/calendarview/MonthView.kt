@@ -20,6 +20,7 @@ class MonthView: View {
         internal const val defaultMrgWeekDayTitle = 15
         internal const val defaultTextDaySize = 40f
         internal const val defaultPaddingSelection = 10
+        internal const val defaultTextWeekdaySize = 35f
 
         internal fun getDefaultParams(): Params {
             return Params(
@@ -30,7 +31,8 @@ class MonthView: View {
                 weekDayTitleColor = defaultWeekdayTitleColor,
                 textDaySize = defaultTextDaySize,
                 mrgWeekDayTitle = defaultMrgWeekDayTitle,
-                paddingSelection = defaultPaddingSelection
+                paddingSelection = defaultPaddingSelection,
+                textWeekdaySize = defaultTextWeekdaySize
             )
         }
 
@@ -95,7 +97,7 @@ class MonthView: View {
         }
         paintWeekDayTitle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = params.weekDayTitleColor
-            this.textSize = 35f
+            this.textSize = params.textWeekdaySize
         }
     }
 
@@ -303,7 +305,8 @@ class MonthView: View {
         internal var weekDayTitleColor: Int,
         internal var mrgWeekDayTitle: Int,
         internal var textDaySize: Float,
-        internal var paddingSelection: Int
+        internal var paddingSelection: Int,
+        internal var textWeekdaySize: Float
     )
 
 }

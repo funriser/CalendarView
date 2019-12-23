@@ -101,9 +101,10 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
                     selectionColor = getColor(R.styleable.CalendarView_selectionColor, MonthView.defaultSelectionColor),
                     highlightColor = getColor(R.styleable.CalendarView_highlightColor, MonthView.defaultHighlightColor),
                     weekDayTitleColor = getColor(R.styleable.CalendarView_textWeekdayColor, MonthView.defaultWeekdayTitleColor),
-                    textDaySize = getColor(R.styleable.CalendarView_textDaySize, MonthView.defaultTextDaySize.toInt()).toFloat(),
+                    textDaySize = getDimension(R.styleable.CalendarView_textDaySize, MonthView.defaultTextDaySize),
                     mrgWeekDayTitle = getDimension(R.styleable.CalendarView_marginWeekdayTop, MonthView.defaultMrgWeekDayTitle.toFloat()).toInt(),
-                    paddingSelection = getDimension(R.styleable.CalendarView_paddingSelection, MonthView.defaultPaddingSelection.toFloat()).toInt()
+                    paddingSelection = getDimension(R.styleable.CalendarView_paddingSelection, MonthView.defaultPaddingSelection.toFloat()).toInt(),
+                    textWeekdaySize = getDimension(R.styleable.CalendarView_textWeekdaySize, MonthView.defaultTextWeekdaySize)
                 )
             } finally {
                 recycle()
@@ -240,6 +241,10 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
     fun setPaddingSelection(padding: Int) {
         monthViewParams = monthViewParams.copy(paddingSelection = padding)
+    }
+
+    fun setTextWeekdaySize(textSize: Float) {
+        monthViewParams = monthViewParams.copy(textWeekdaySize = textSize)
     }
 
     override fun invalidate() {
