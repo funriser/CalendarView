@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="colorSelection">#8CC454</color>
-    <color name="colorHighlight">#4D9e9e9e</color>
+    <color name="colorGreyHighlight">#4D9e9e9e</color>
+    <color name="colorWeekdayText">#808080</color>
 </resources>

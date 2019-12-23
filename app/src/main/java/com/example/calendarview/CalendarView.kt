@@ -2,7 +2,6 @@ package com.example.calendarview
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
@@ -18,12 +17,12 @@ import java.util.*
 
 class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
-    private var textMonthSize = 20f
-    private var textMonthColor = Color.BLACK
-    private var textMonthMargin = 10
-    private var chevronSize = 60
-    private var chevronColor = Color.BLACK
-    private var chevronSideMargin = 30
+    private var textMonthSize = sp(14f)
+    private var textMonthColor = color(android.R.color.black)
+    private var textMonthMargin = dip(30)
+    private var chevronSize = dip(30)
+    private var chevronColor = color(android.R.color.black)
+    private var chevronSideMargin = dip(12)
 
     private val monthAdapter = MonthAdapter(this)
     private var monthViewParams: MonthView.Params
@@ -95,7 +94,7 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     }
 
     constructor(ctx: Context) : super(ctx) {
-        monthViewParams = MonthView.getDefaultParams()
+        monthViewParams = MonthView.getDefaultParams(ctx)
         init()
     }
 
@@ -110,15 +109,15 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
                 chevronSideMargin = getDimension(R.styleable.CalendarView_chevronSideMargin, chevronSideMargin.toFloat()).toInt()
                 chevronColor = getColor(R.styleable.CalendarView_chevronColor, chevronColor)
                 monthViewParams = MonthView.Params(
-                    textColor = getColor(R.styleable.CalendarView_textColor, MonthView.defaultTextColor),
-                    textColorSelected = getColor(R.styleable.CalendarView_textColorSelected, MonthView.defaultTextColorSelected),
-                    selectionColor = getColor(R.styleable.CalendarView_selectionColor, MonthView.defaultSelectionColor),
-                    highlightColor = getColor(R.styleable.CalendarView_highlightColor, MonthView.defaultHighlightColor),
-                    weekDayTitleColor = getColor(R.styleable.CalendarView_textWeekdayColor, MonthView.defaultWeekdayTitleColor),
-                    textDaySize = getDimension(R.styleable.CalendarView_textDaySize, MonthView.defaultTextDaySize),
-                    mrgWeekDayTitle = getDimension(R.styleable.CalendarView_marginWeekdayTop, MonthView.defaultMrgWeekDayTitle.toFloat()).toInt(),
-                    paddingSelection = getDimension(R.styleable.CalendarView_paddingSelection, MonthView.defaultPaddingSelection.toFloat()).toInt(),
-                    textWeekdaySize = getDimension(R.styleable.CalendarView_textWeekdaySize, MonthView.defaultTextWeekdaySize)
+                    textColor = getColor(R.styleable.CalendarView_textColor, MonthView.getDefaultTextColor(ctx)),
+                    textColorSelected = getColor(R.styleable.CalendarView_textColorSelected, MonthView.getDefaultTextColorSelected(ctx)),
+                    selectionColor = getColor(R.styleable.CalendarView_selectionColor, MonthView.getDefaultSelectionColor(ctx)),
+                    highlightColor = getColor(R.styleable.CalendarView_highlightColor, MonthView.getDefaultHighlightColor(ctx)),
+                    weekDayTitleColor = getColor(R.styleable.CalendarView_textWeekdayColor, MonthView.getDefaultWeekdayTitleColor(ctx)),
+                    textDaySize = getDimension(R.styleable.CalendarView_textDaySize, MonthView.getDefaultTextDaySize(ctx)),
+                    mrgWeekDayTitle = getDimension(R.styleable.CalendarView_marginWeekdayTop, MonthView.getDefaultMarginWeekdayTitle(ctx).toFloat()).toInt(),
+                    paddingSelection = getDimension(R.styleable.CalendarView_paddingSelection, MonthView.getDefaultPaddingSelection(ctx).toFloat()).toInt(),
+                    textWeekdaySize = getDimension(R.styleable.CalendarView_textWeekdaySize, MonthView.getDefaultTextWeekdaySize(ctx))
                 )
             } finally {
                 recycle()
@@ -167,7 +166,8 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
                 //calculate based on height
                 getPagerWidth(pagerMrgWidth, height)
             } else {
-                getExactPagerDimension(pagerMrgWidth)
+                val pagerDesiredWidth = getPagerDesiredWidth(width)
+                getExactPagerDimension(pagerDesiredWidth)
             }
         }
 
@@ -186,6 +186,10 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
     private fun isExactMeasureMode(mode: Int): Boolean {
         return mode == MeasureSpec.EXACTLY
+    }
+
+    private fun getPagerDesiredWidth(fullWidth: Int): Int {
+        return (fullWidth * PAGER_WIDTH_PERCENT).toInt()
     }
 
     /**
@@ -295,7 +299,10 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     companion object {
 
         //height to width ratio
-        const val MONTH_PAGER_RATIO = 0.6
+        const val MONTH_PAGER_RATIO = 0.75
+
+        //optimal percent of the parent view width
+        const val PAGER_WIDTH_PERCENT = 0.75
 
     }
 

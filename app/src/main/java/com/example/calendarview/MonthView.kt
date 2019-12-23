@@ -12,27 +12,45 @@ class MonthView: View {
 
     companion object {
 
-        internal const val defaultTextColor = Color.BLACK
-        internal const val defaultTextColorSelected = Color.WHITE
-        internal const val defaultSelectionColor = Color.GREEN
-        internal const val defaultHighlightColor = Color.GRAY
-        internal const val defaultWeekdayTitleColor = Color.GREEN
-        internal const val defaultMrgWeekDayTitle = 15
-        internal const val defaultTextDaySize = 40f
-        internal const val defaultPaddingSelection = 10
-        internal const val defaultTextWeekdaySize = 35f
+        internal fun getDefaultTextColor(context: Context): Int {
+            return context.color(android.R.color.black)
+        }
+        internal fun getDefaultTextColorSelected(context: Context): Int {
+            return context.color(android.R.color.white)
+        }
+        internal fun getDefaultSelectionColor(context: Context): Int {
+            return context.getThemeColor(android.R.attr.colorAccent)
+        }
+        internal fun getDefaultHighlightColor(context: Context): Int {
+            return context.color(R.color.colorGreyHighlight)
+        }
+        internal fun getDefaultWeekdayTitleColor(context: Context): Int {
+            return context.color(R.color.colorWeekdayText)
+        }
+        internal fun getDefaultMarginWeekdayTitle(context: Context): Int {
+            return context.dip(15)
+        }
+        internal fun getDefaultTextDaySize(context: Context): Float {
+            return context.sp(12f)
+        }
+        internal fun getDefaultPaddingSelection(context: Context): Int {
+            return context.dip(5)
+        }
+        internal fun getDefaultTextWeekdaySize(context: Context): Float {
+            return context.sp(12f)
+        }
 
-        internal fun getDefaultParams(): Params {
+        internal fun getDefaultParams(context: Context): Params {
             return Params(
-                textColor = defaultTextColor,
-                textColorSelected = defaultTextColorSelected,
-                selectionColor = defaultSelectionColor,
-                highlightColor = defaultHighlightColor,
-                weekDayTitleColor = defaultWeekdayTitleColor,
-                textDaySize = defaultTextDaySize,
-                mrgWeekDayTitle = defaultMrgWeekDayTitle,
-                paddingSelection = defaultPaddingSelection,
-                textWeekdaySize = defaultTextWeekdaySize
+                textColor = getDefaultTextColor(context),
+                textColorSelected = getDefaultTextColorSelected(context),
+                selectionColor = getDefaultSelectionColor(context),
+                highlightColor = getDefaultHighlightColor(context),
+                weekDayTitleColor = getDefaultWeekdayTitleColor(context),
+                textDaySize = getDefaultTextDaySize(context),
+                mrgWeekDayTitle = getDefaultMarginWeekdayTitle(context),
+                paddingSelection = getDefaultPaddingSelection(context),
+                textWeekdaySize = getDefaultTextWeekdaySize(context)
             )
         }
 
@@ -68,11 +86,11 @@ class MonthView: View {
         }
 
     constructor(ctx: Context) : super(ctx) {
-        params = getDefaultParams()
+        params = getDefaultParams(ctx)
     }
 
     constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs) {
-        params = getDefaultParams()
+        params = getDefaultParams(ctx)
     }
 
     constructor(ctx: Context, params: Params, monthData: MonthData): super(ctx) {
