@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import androidx.annotation.ColorInt
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
@@ -225,73 +226,143 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
         }
     }
 
+    /**
+     * Set month displayed by calendar
+     * @param month month of year from 0 to 11. 0 is for January and 11 is for December
+     * @param year year
+     */
     fun setMonth(month: Int, year: Int) {
         val monthData = MonthData(month, year)
         setMonth(monthData)
     }
 
+    /**
+     * Set text size for the text that displays month name
+     * @param textMonthSize desired text size in px
+     */
     fun setTextMonthSize(textMonthSize: Float) {
         this.textMonthSize = textMonthSize
         invalidate()
     }
 
-    fun setTextMonthColor(textMonthColor: Int) {
+    /**
+     * Set text color for the text that displays month name
+     * @param textMonthColor desired text color
+     */
+    fun setTextMonthColor(@ColorInt textMonthColor: Int) {
         this.textMonthColor = textMonthColor
         invalidate()
     }
 
+    /**
+     * Set margin between month title and calendar matrix
+     * @param textMonthMargin desired margin in px
+     */
     fun setTextMonthMargin(textMonthMargin: Int) {
         this.textMonthMargin = textMonthMargin
         invalidate()
     }
 
-    fun setTextColor(color: Int) {
+    /**
+     * Set text color for the text that displays day of month
+     * @param color desired color
+     */
+    fun setTextDayColor(@ColorInt color: Int) {
         monthViewParams = monthViewParams.copy(textColor = color)
     }
 
-    fun setTextColorSelected(color: Int) {
+    /**
+     * Set color for the text that displays day of month when it is selected
+     * @param color desired color
+     */
+    fun setTextColorSelected(@ColorInt color: Int) {
         monthViewParams = monthViewParams.copy(textColorSelected = color)
     }
 
-    fun setSelectionColor(color: Int) {
+    /**
+     * Set color for the mark that indicates that the day of month is selected
+     * Selected date represents date that was selected by user with touch interaction
+     * Selected date shows the color indicator
+     * @param color desired color
+     */
+    fun setSelectionColor(@ColorInt color: Int) {
         monthViewParams = monthViewParams.copy(selectionColor = color)
     }
 
-    fun setHighlightColor(color: Int) {
+    /**
+     * Set color for the mark that indicates that the day of month is highlighted
+     * Highlighted date shows the color indicator
+     * @param color desired color
+     */
+    fun setHighlightColor(@ColorInt color: Int) {
         monthViewParams = monthViewParams.copy(highlightColor = color)
     }
 
-    fun setTextWeekdayColor(color: Int) {
+    /**
+     * Set text color for the text that displays week of month
+     * @param color desired color
+     */
+    fun setTextWeekdayColor(@ColorInt color: Int) {
         monthViewParams = monthViewParams.copy(weekDayTitleColor = color)
     }
 
+    /**
+     * Set text size for the text that displays day of month
+     * @param textSize desired text size in px
+     */
     fun setTextDaySize(textSize: Float) {
         monthViewParams = monthViewParams.copy(textDaySize = textSize)
     }
 
-    fun setMarginWeekdayTop(margin: Int) {
+    /**
+     * Set margin between the text that displays week of month and
+     * the text that represents days of month
+     * @param margin desired margin in px
+     */
+    fun setMarginWeekday(margin: Int) {
         monthViewParams = monthViewParams.copy(mrgWeekDayTitle = margin)
     }
 
+    /**
+     * Padding for the indicators of highlighted and selected dates
+     * @param padding desired padding
+     */
     fun setPaddingSelection(padding: Int) {
         monthViewParams = monthViewParams.copy(paddingSelection = padding)
     }
 
+
+    /**
+     * Set text size for the text that displays week of month
+     * @param textSize desired text size in px
+     */
     fun setTextWeekdaySize(textSize: Float) {
         monthViewParams = monthViewParams.copy(textWeekdaySize = textSize)
     }
 
+    /**
+     * Set size of the arrows that switch dates
+     * @param size desired text size in px
+     */
     fun setChevronSize(size: Int) {
         chevronSize = size
         invalidate()
     }
 
+    /**
+     * Set side margin of the arrows that switch dates
+     * @param margin desired margin in px
+     */
     fun setChevronSideMargin(margin: Int) {
         chevronSideMargin = margin
         invalidate()
     }
 
-    fun setChevronColor(color: Int) {
+    /**
+     * Set color of the arrows that switch dates
+     * @param color desired color
+     */
+    fun setChevronColor(@ColorInt color: Int) {
         chevronColor = color
         invalidate()
     }
