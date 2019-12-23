@@ -1,2 +1,2 @@
-include ':app'
+include ':sample', ':calendarview'
 rootProject.name='CalendarView'
