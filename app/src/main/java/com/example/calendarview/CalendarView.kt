@@ -1,10 +1,12 @@
 package com.example.calendarview
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
@@ -19,6 +21,9 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     private var textMonthSize = 20f
     private var textMonthColor = Color.BLACK
     private var textMonthMargin = 10
+    private var chevronSize = 60
+    private var chevronColor = Color.BLACK
+    private var chevronSideMargin = 30
 
     private val monthAdapter = MonthAdapter(this)
     private var monthViewParams: MonthView.Params
@@ -65,6 +70,12 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
         pagerMonth.adapter = monthAdapter
         pagerMonth.addOnPageChangeListener(monthChangeListener)
         setMonth(CalendarAPI.getCurrentMonthData())
+        ibChevronLeft.setOnClickListener {
+            pagerMonth.currentItem --
+        }
+        ibChevronRight.setOnClickListener {
+            pagerMonth.currentItem ++
+        }
     }
 
     private fun setMonth(monthData: MonthData) {
@@ -95,6 +106,9 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
                 textMonthSize = getDimensionPixelSize(R.styleable.CalendarView_textMonthSize, textMonthSize.toInt()).toFloat()
                 textMonthColor = getColor(R.styleable.CalendarView_textMonthColor, textMonthColor)
                 textMonthMargin = getDimension(R.styleable.CalendarView_textMonthMargin, textMonthMargin.toFloat()).toInt()
+                chevronSize = getDimension(R.styleable.CalendarView_chevronSize, chevronSize.toFloat()).toInt()
+                chevronSideMargin = getDimension(R.styleable.CalendarView_chevronSideMargin, chevronSideMargin.toFloat()).toInt()
+                chevronColor = getColor(R.styleable.CalendarView_chevronColor, chevronColor)
                 monthViewParams = MonthView.Params(
                     textColor = getColor(R.styleable.CalendarView_textColor, MonthView.defaultTextColor),
                     textColorSelected = getColor(R.styleable.CalendarView_textColorSelected, MonthView.defaultTextColorSelected),
@@ -119,6 +133,17 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
         val lpMonthView = pagerMonth.layoutParams as MarginLayoutParams
         lpMonthView.topMargin = textMonthMargin
         pagerMonth.layoutParams = lpMonthView
+        setChevronParams(ibChevronLeft)
+        setChevronParams(ibChevronRight)
+    }
+
+    private fun setChevronParams(ibChevron: ImageButton) {
+        val chevronLeftLP = ibChevron.layoutParams as LayoutParams
+        chevronLeftLP.width = chevronSize
+        chevronLeftLP.height = chevronSize
+        chevronLeftLP.marginStart = chevronSideMargin
+        ibChevron.layoutParams = chevronLeftLP
+        ibChevron.imageTintList = ColorStateList.valueOf(chevronColor)
     }
 
     override fun onCreateMonthView(context: Context, monthData: MonthData): MonthView {
@@ -245,6 +270,21 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
     fun setTextWeekdaySize(textSize: Float) {
         monthViewParams = monthViewParams.copy(textWeekdaySize = textSize)
+    }
+
+    fun setChevronSize(size: Int) {
+        chevronSize = size
+        invalidate()
+    }
+
+    fun setChevronSideMargin(margin: Int) {
+        chevronSideMargin = margin
+        invalidate()
+    }
+
+    fun setChevronColor(color: Int) {
+        chevronColor = color
+        invalidate()
     }
 
     override fun invalidate() {
