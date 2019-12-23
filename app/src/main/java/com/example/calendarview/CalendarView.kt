@@ -21,7 +21,11 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     private var textMonthMargin = 10
 
     private val monthAdapter = MonthAdapter(this)
-    private var monthViewParams: MonthView.Params? = null
+    private var monthViewParams: MonthView.Params
+        set(value) {
+            field = value
+            monthAdapter.invalidatePageParams(value)
+        }
 
     var onDateSelected: ((Date) -> Unit)? = null
         set(value) {
@@ -80,6 +84,7 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     }
 
     constructor(ctx: Context) : super(ctx) {
+        monthViewParams = MonthView.getDefaultParams()
         init()
     }
 
@@ -116,11 +121,7 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     }
 
     override fun onCreateMonthView(context: Context, monthData: MonthData): MonthView {
-        return if (monthViewParams == null) {
-            MonthView(context, monthData)
-        } else {
-            MonthView(context, monthViewParams!!, monthData)
-        }
+        return MonthView(context, monthViewParams, monthData)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -192,6 +193,58 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
             //horizontal layout?
             availableHeight / 3
         }
+    }
+
+    fun setTextMonthSize(textMonthSize: Float) {
+        this.textMonthSize = textMonthSize
+        invalidate()
+    }
+
+    fun setTextMonthColor(textMonthColor: Int) {
+        this.textMonthColor = textMonthColor
+        invalidate()
+    }
+
+    fun setTextMonthMargin(textMonthMargin: Int) {
+        this.textMonthMargin = textMonthMargin
+        invalidate()
+    }
+
+    fun setTextColor(color: Int) {
+        monthViewParams = monthViewParams.copy(textColor = color)
+    }
+
+    fun setTextColorSelected(color: Int) {
+        monthViewParams = monthViewParams.copy(textColorSelected = color)
+    }
+
+    fun setSelectionColor(color: Int) {
+        monthViewParams = monthViewParams.copy(selectionColor = color)
+    }
+
+    fun setHighlightColor(color: Int) {
+        monthViewParams = monthViewParams.copy(highlightColor = color)
+    }
+
+    fun setTextWeekdayColor(color: Int) {
+        monthViewParams = monthViewParams.copy(weekDayTitleColor = color)
+    }
+
+    fun setTextDaySize(textSize: Float) {
+        monthViewParams = monthViewParams.copy(textDaySize = textSize)
+    }
+
+    fun setMarginWeekdayTop(margin: Int) {
+        monthViewParams = monthViewParams.copy(mrgWeekDayTitle = margin)
+    }
+
+    fun setPaddingSelection(padding: Int) {
+        monthViewParams = monthViewParams.copy(paddingSelection = padding)
+    }
+
+    override fun invalidate() {
+        init()
+        super.invalidate()
     }
 
     companion object {

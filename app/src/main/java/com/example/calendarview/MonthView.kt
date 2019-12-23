@@ -21,22 +21,30 @@ class MonthView: View {
         internal const val defaultTextDaySize = 40f
         internal const val defaultPaddingSelection = 10
 
+        internal fun getDefaultParams(): Params {
+            return Params(
+                textColor = defaultTextColor,
+                textColorSelected = defaultTextColorSelected,
+                selectionColor = defaultSelectionColor,
+                highlightColor = defaultHighlightColor,
+                weekDayTitleColor = defaultWeekdayTitleColor,
+                textDaySize = defaultTextDaySize,
+                mrgWeekDayTitle = defaultMrgWeekDayTitle,
+                paddingSelection = defaultPaddingSelection
+            )
+        }
+
     }
 
     private var dateMatrix = MonthMatrix(Calendar.JULY,2019)
     private var currentCells: List<List<DateCell?>> = emptyList()
     private var weekDayTitleCells: List<WeekDayCell> = emptyList()
 
-    private var textColor = defaultTextColor
-    private var textColorSelected = defaultTextColorSelected
-    private var selectionColor = defaultSelectionColor
-    private var highlightColor = defaultHighlightColor
-    private var weekDayTitleColor = defaultWeekdayTitleColor
-
-    private var mrgWeekDayTitle = defaultMrgWeekDayTitle
-    private var paddingSelection = defaultPaddingSelection
-
-    private var textDaySize = defaultTextDaySize
+    private var params: Params
+        set(value) {
+            field = value
+            init()
+        }
 
     private var selectedDate: DateCell? = null
 
@@ -58,50 +66,35 @@ class MonthView: View {
         }
 
     constructor(ctx: Context) : super(ctx) {
-        init()
+        params = getDefaultParams()
     }
 
     constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs) {
-        init()
-    }
-
-    constructor(ctx: Context, monthData: MonthData): super(ctx) {
-        dateMatrix = MonthMatrix(monthData)
-        init()
+        params = getDefaultParams()
     }
 
     constructor(ctx: Context, params: Params, monthData: MonthData): super(ctx) {
         dateMatrix = MonthMatrix(monthData)
-        params.let {
-            textColor = it.textColor
-            textColorSelected = it.textColorSelected
-            selectionColor = it.selectionColor
-            highlightColor = it.highlightColor
-            weekDayTitleColor = it.weekDayTitleColor
-            mrgWeekDayTitle = it.mrgWeekDayTitle
-            textDaySize = it.textDaySize
-            paddingSelection = it.paddingSelection
-        }
-        init()
+        this.params = params
     }
 
     private fun init() {
         paintDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = textColor
-            this.textSize = textDaySize
+            this.color = params.textColor
+            this.textSize = params.textDaySize
         }
         paintSelectedDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = textColorSelected
-            this.textSize = textDaySize
+            this.color = params.textColorSelected
+            this.textSize = params.textDaySize
         }
         paintCellSelection = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = selectionColor
+            this.color = params.selectionColor
         }
         paintCellHighlight = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = highlightColor
+            this.color = params.highlightColor
         }
         paintWeekDayTitle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = weekDayTitleColor
+            this.color = params.weekDayTitleColor
             this.textSize = 35f
         }
     }
@@ -134,12 +127,12 @@ class MonthView: View {
                     drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintDateText)
                 } else {
                     //if highlighted
-                    drawCircleInsideRectangle(canvas, dateCell.rect, paintCellHighlight, paddingSelection)
+                    drawCircleInsideRectangle(canvas, dateCell.rect, paintCellHighlight, params.paddingSelection)
                     drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintSelectedDateText)
                 }
             } else {
                 //if selected
-                drawCircleInsideRectangle(canvas, dateCell.rect, paintCellSelection, paddingSelection)
+                drawCircleInsideRectangle(canvas, dateCell.rect, paintCellSelection, params.paddingSelection)
                 drawTextInsideRect(canvas, dateCell.number.toString(), dateCell.rect, paintSelectedDateText)
             }
         }
@@ -277,7 +270,7 @@ class MonthView: View {
         val weekDayTextSample = CalendarAPI.getWeekDayShortName(0) //get localed week day text sample
         val textRect = Rect()
         measureText(weekDayTextSample, paintWeekDayTitle, textRect)
-        return textRect.height() + mrgWeekDayTitle
+        return textRect.height() + params.mrgWeekDayTitle
     }
 
     private fun applyHighlightedDates(dates: List<Date>) {
@@ -297,12 +290,17 @@ class MonthView: View {
         paint.getTextBounds(text, 0, text.length, rect)
     }
 
-    class Params(
-        internal val textColor: Int,
-        internal val textColorSelected: Int,
-        internal val selectionColor: Int,
-        internal val highlightColor: Int,
-        internal val weekDayTitleColor: Int,
+    fun invalidateParams(params: Params) {
+        this.params = params
+        invalidate()
+    }
+
+    data class Params(
+        internal var textColor: Int,
+        internal var textColorSelected: Int,
+        internal var selectionColor: Int,
+        internal var highlightColor: Int,
+        internal var weekDayTitleColor: Int,
         internal var mrgWeekDayTitle: Int,
         internal var textDaySize: Float,
         internal var paddingSelection: Int

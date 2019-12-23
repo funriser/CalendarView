@@ -12,9 +12,19 @@ class MonthAdapter(private val monthOwner: MonthOwner): PagerAdapter() {
 
     var highlightedDates: List<Date>? = null
 
+    private val monthViews = hashMapOf<Int, MonthView>()
+
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val monthData = getMonthData(position)
-        val monthView = monthOwner.onCreateMonthView(container.context, monthData).apply {
+        val monthView = monthOwner.onCreateMonthView(container.context, monthData)
+        bindMonthView(monthView, monthData)
+        monthViews[position] = monthView
+        container.addView(monthView)
+        return monthView
+    }
+
+    private fun bindMonthView(monthView: MonthView, monthData: MonthData) {
+        monthView.apply {
             highlightedDates?.let {
                 val filteredDates = CalendarAPI.filterByMonth(it, monthData)
                 if (filteredDates.isNotEmpty()) {
@@ -23,8 +33,6 @@ class MonthAdapter(private val monthOwner: MonthOwner): PagerAdapter() {
             }
             onDateSelected = this@MonthAdapter.onDateSelected
         }
-        container.addView(monthView)
-        return monthView
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -34,6 +42,7 @@ class MonthAdapter(private val monthOwner: MonthOwner): PagerAdapter() {
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         val monthView = `object` as MonthView
         monthView.onDateSelected = null
+        monthViews.remove(position)
         container.removeView(monthView)
     }
 
@@ -49,6 +58,12 @@ class MonthAdapter(private val monthOwner: MonthOwner): PagerAdapter() {
 
     internal fun getPosition(monthData: MonthData): Int {
         return (monthData.year - 1) * 12 + monthData.month
+    }
+
+    internal fun invalidatePageParams(monthViewParams: MonthView.Params) {
+        monthViews.forEach {
+            it.value.invalidateParams(monthViewParams)
+        }
     }
 
     interface MonthOwner {
