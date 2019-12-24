@@ -46,38 +46,38 @@ vCalendar.highlightedDates = listOf(date1, date2, date3)
 * Month header size: ```app:textMonthSize="[dimension]"```
 * Month header margin: ```app:textMonthMargin="[dimension]"```
 * Month header color: ```app:textMonthColor="[color]"```
-* Arrow size: ```app:chevronSize="[dimension]"```
-* Arrow color: ```app:chevronColor="[color]"```
-* Arrow side margin: ```app:chevronSideMargin="[dimension]"```
+* Arrows size: ```app:arrowsSize="[dimension]"```
+* Arrows color: ```app:arrowsColor="[color]"```
+* Arrows side margin: ```app:arrowsSideMargin="[dimension]"```
 * Day of month text size: ```app:textDaySize="[dimension]"```
 * Day of month text color: ```app:textDayColor="[color]"```
-* Day of month selected text color: ```app:textColorSelected="[color]"```
+* Day of month selected text color: ```app:textDayColorSelected="[color]"```
 * Selection indicator color: ```app:selectionColor="[color]"```
 * Highlight indicator color: ```app:highlightColor="[color]"```
+* Selection indicator padding: ```app:paddingSelection="[dimension]"```
 * Day of week text size: ```app:textWeekdaySize="[dimension]"```
 * Day of week text color: ```app:textWeekdayColor="[color]"```
 * Day of week margin: ```app:marginWeekdayTop="[dimension]"```
-* Selection indicator padding: ```app:paddingSelection="[dimension]"```
 ### Kotlin
 ```kotlin
 vCalendar.apply {
     setMonth(month, year) //set month to show on calendar
+    setHighlightedDates(dates) // Set dates to highlight
     setTextMonthSize(textSize) //Month header size
-    setTextMonthMargin(margin) //Month header margin
     setTextMonthColor(color) //Month header color
-    setChevronSize(size) //Arrow size
-    setChevronColor(color) //Arrow color
-    setChevronSideMargin(margin) //Arrow side margin
+    setTextMonthMargin(margin) //Month header margin
+    setArrowsSize(size) //Arrows size
+    setArrowsColor(color) //Arrows color
+    setArrowsSideMargin(margin) //Arrows side margin
     setTextDaySize(textSize) //Day of month text size
     setTextDayColor(color) //Day of month text color
-    setTextColorSelected(color) //Day of month selected text color
+    setTextDayColorSelected(color) //Day of month selected text color
     setSelectionColor(color) //Selection indicator color
     setHighlightColor(color) //Highlight indicator color
+    setPaddingSelection(padding) //Selection indicator padding
     setTextWeekdaySize(textSize) //Day of week text size
     setTextWeekdayColor(color) //Day of week text color
-    setMarginWeekday(margin) //Day of week margin
-    setPaddingSelection(padding) //Selection indicator padding
-    setHighlightedDates(dates) // Set dates to highlight
+    setMarginWeekdayTop(margin) //Day of week margin
 }
 ```
 
