@@ -1,6 +1,12 @@
 # CalendarView
+[![](https://jitpack.io/v/funriser/CalendarView.svg)](https://jitpack.io/#funriser/CalendarView)
 
 CalendarView is a simple and customizable calendar widget with possibilities to select and highlight dates.
+
+![alt text](https://raw.githubusercontent.com/funriser/CalendarView/master/screenshots/screenshot1.png)
+
+![alt text](https://raw.githubusercontent.com/funriser/CalendarView/master/screenshots/screenshot2.png)
+
 ## Gradle
 To get a CalendarView library into your build:
 
@@ -17,7 +23,7 @@ allprojects {
 Step 2. Add the dependency to your module-level build.gradle:
 ```gradle
 dependencies {
-
+    implementation 'com.github.funriser:CalendarView:v0.1.0'
 }
 ```
 ## How to use?
