@@ -12,10 +12,10 @@ class MonthView: View {
 
     companion object {
 
-        internal fun getDefaultTextColor(context: Context): Int {
+        internal fun getDefaultTextDayColor(context: Context): Int {
             return context.color(android.R.color.black)
         }
-        internal fun getDefaultTextColorSelected(context: Context): Int {
+        internal fun getDefaultTextDayColorSelected(context: Context): Int {
             return context.color(android.R.color.white)
         }
         internal fun getDefaultSelectionColor(context: Context): Int {
@@ -24,10 +24,10 @@ class MonthView: View {
         internal fun getDefaultHighlightColor(context: Context): Int {
             return context.color(R.color.colorGreyHighlight)
         }
-        internal fun getDefaultWeekdayTitleColor(context: Context): Int {
+        internal fun getDefaultTextWeekdayColor(context: Context): Int {
             return context.color(R.color.colorWeekdayText)
         }
-        internal fun getDefaultMarginWeekdayTitle(context: Context): Int {
+        internal fun getDefaultMarginWeekdayTop(context: Context): Int {
             return context.dip(15)
         }
         internal fun getDefaultTextDaySize(context: Context): Float {
@@ -42,10 +42,10 @@ class MonthView: View {
 
         internal fun getDefaultParams(context: Context): Params {
             return Params(
-                textColor = getDefaultTextColor(
+                textDayColor = getDefaultTextDayColor(
                     context
                 ),
-                textColorSelected = getDefaultTextColorSelected(
+                textDayColorSelected = getDefaultTextDayColorSelected(
                     context
                 ),
                 selectionColor = getDefaultSelectionColor(
@@ -54,13 +54,13 @@ class MonthView: View {
                 highlightColor = getDefaultHighlightColor(
                     context
                 ),
-                weekDayTitleColor = getDefaultWeekdayTitleColor(
+                textWeekdayColor = getDefaultTextWeekdayColor(
                     context
                 ),
                 textDaySize = getDefaultTextDaySize(
                     context
                 ),
-                mrgWeekDayTitle = getDefaultMarginWeekdayTitle(
+                marginWeekdayTop = getDefaultMarginWeekdayTop(
                     context
                 ),
                 paddingSelection = getDefaultPaddingSelection(
@@ -118,11 +118,11 @@ class MonthView: View {
 
     private fun init() {
         paintDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = params.textColor
+            this.color = params.textDayColor
             this.textSize = params.textDaySize
         }
         paintSelectedDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = params.textColorSelected
+            this.color = params.textDayColorSelected
             this.textSize = params.textDaySize
         }
         paintCellSelection = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -132,7 +132,7 @@ class MonthView: View {
             this.color = params.highlightColor
         }
         paintWeekDayTitle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = params.weekDayTitleColor
+            this.color = params.textWeekdayColor
             this.textSize = params.textWeekdaySize
         }
     }
@@ -312,7 +312,7 @@ class MonthView: View {
             CalendarAPI.getWeekDayShortName(0) //get localed week day text sample
         val textRect = Rect()
         measureText(weekDayTextSample, paintWeekDayTitle, textRect)
-        return textRect.height() + params.mrgWeekDayTitle
+        return textRect.height() + params.marginWeekdayTop
     }
 
     private fun applyHighlightedDates(dates: List<Date>) {
@@ -341,15 +341,15 @@ class MonthView: View {
     }
 
     data class Params(
-        internal var textColor: Int,
-        internal var textColorSelected: Int,
+        internal var textDaySize: Float,
+        internal var textDayColor: Int,
+        internal var textDayColorSelected: Int,
         internal var selectionColor: Int,
         internal var highlightColor: Int,
-        internal var weekDayTitleColor: Int,
-        internal var mrgWeekDayTitle: Int,
-        internal var textDaySize: Float,
-        internal var paddingSelection: Int,
-        internal var textWeekdaySize: Float
+        internal var textWeekdaySize: Float,
+        internal var textWeekdayColor: Int,
+        internal var marginWeekdayTop: Int,
+        internal var paddingSelection: Int
     )
 
 }

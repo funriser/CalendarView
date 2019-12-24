@@ -21,9 +21,9 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     private var textMonthSize = sp(14f)
     private var textMonthColor = color(android.R.color.black)
     private var textMonthMargin = dip(30)
-    private var chevronSize = dip(30)
-    private var chevronColor = color(android.R.color.black)
-    private var chevronSideMargin = dip(12)
+    private var arrowsSize = dip(30)
+    private var arrowsColor = color(android.R.color.black)
+    private var arrowsSideMargin = dip(12)
 
     private val monthAdapter = MonthAdapter(this)
     private var monthViewParams: MonthView.Params
@@ -106,17 +106,17 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
                 textMonthSize = getDimensionPixelSize(R.styleable.CalendarView_textMonthSize, textMonthSize.toInt()).toFloat()
                 textMonthColor = getColor(R.styleable.CalendarView_textMonthColor, textMonthColor)
                 textMonthMargin = getDimension(R.styleable.CalendarView_textMonthMargin, textMonthMargin.toFloat()).toInt()
-                chevronSize = getDimension(R.styleable.CalendarView_chevronSize, chevronSize.toFloat()).toInt()
-                chevronSideMargin = getDimension(R.styleable.CalendarView_chevronSideMargin, chevronSideMargin.toFloat()).toInt()
-                chevronColor = getColor(R.styleable.CalendarView_chevronColor, chevronColor)
+                arrowsSize = getDimension(R.styleable.CalendarView_arrowsSize, arrowsSize.toFloat()).toInt()
+                arrowsSideMargin = getDimension(R.styleable.CalendarView_arrowsSideMargin, arrowsSideMargin.toFloat()).toInt()
+                arrowsColor = getColor(R.styleable.CalendarView_arrowsColor, arrowsColor)
                 monthViewParams = MonthView.Params(
-                    textColor = getColor(
-                        R.styleable.CalendarView_textColor,
-                        MonthView.getDefaultTextColor(ctx)
+                    textDayColor = getColor(
+                        R.styleable.CalendarView_textDayColor,
+                        MonthView.getDefaultTextDayColor(ctx)
                     ),
-                    textColorSelected = getColor(
-                        R.styleable.CalendarView_textColorSelected,
-                        MonthView.getDefaultTextColorSelected(
+                    textDayColorSelected = getColor(
+                        R.styleable.CalendarView_textDayColorSelected,
+                        MonthView.getDefaultTextDayColorSelected(
                             ctx
                         )
                     ),
@@ -132,9 +132,9 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
                             ctx
                         )
                     ),
-                    weekDayTitleColor = getColor(
+                    textWeekdayColor = getColor(
                         R.styleable.CalendarView_textWeekdayColor,
-                        MonthView.getDefaultWeekdayTitleColor(
+                        MonthView.getDefaultTextWeekdayColor(
                             ctx
                         )
                     ),
@@ -142,9 +142,9 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
                         R.styleable.CalendarView_textDaySize,
                         MonthView.getDefaultTextDaySize(ctx)
                     ),
-                    mrgWeekDayTitle = getDimension(
+                    marginWeekdayTop = getDimension(
                         R.styleable.CalendarView_marginWeekdayTop,
-                        MonthView.getDefaultMarginWeekdayTitle(
+                        MonthView.getDefaultMarginWeekdayTop(
                             ctx
                         ).toFloat()
                     ).toInt(),
@@ -180,11 +180,11 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
     private fun setChevronParams(ibChevron: ImageButton) {
         val chevronLeftLP = ibChevron.layoutParams as LayoutParams
-        chevronLeftLP.width = chevronSize
-        chevronLeftLP.height = chevronSize
-        chevronLeftLP.marginStart = chevronSideMargin
+        chevronLeftLP.width = arrowsSize
+        chevronLeftLP.height = arrowsSize
+        chevronLeftLP.marginStart = arrowsSideMargin
         ibChevron.layoutParams = chevronLeftLP
-        ibChevron.imageTintList = ColorStateList.valueOf(chevronColor)
+        ibChevron.imageTintList = ColorStateList.valueOf(arrowsColor)
     }
 
     override fun onCreateMonthView(context: Context, monthData: MonthData): MonthView {
@@ -309,15 +309,15 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
      * @param color desired color
      */
     fun setTextDayColor(@ColorInt color: Int) {
-        monthViewParams = monthViewParams.copy(textColor = color)
+        monthViewParams = monthViewParams.copy(textDayColor = color)
     }
 
     /**
      * Set color for the text that displays day of month when it is selected
      * @param color desired color
      */
-    fun setTextColorSelected(@ColorInt color: Int) {
-        monthViewParams = monthViewParams.copy(textColorSelected = color)
+    fun setTextDayColorSelected(@ColorInt color: Int) {
+        monthViewParams = monthViewParams.copy(textDayColorSelected = color)
     }
 
     /**
@@ -344,7 +344,7 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
      * @param color desired color
      */
     fun setTextWeekdayColor(@ColorInt color: Int) {
-        monthViewParams = monthViewParams.copy(weekDayTitleColor = color)
+        monthViewParams = monthViewParams.copy(textWeekdayColor = color)
     }
 
     /**
@@ -360,8 +360,8 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
      * the text that represents days of month
      * @param margin desired margin in px
      */
-    fun setMarginWeekday(margin: Int) {
-        monthViewParams = monthViewParams.copy(mrgWeekDayTitle = margin)
+    fun setMarginWeekdayTop(margin: Int) {
+        monthViewParams = monthViewParams.copy(marginWeekdayTop = margin)
     }
 
     /**
@@ -385,8 +385,8 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
      * Set size of the arrows that switch dates
      * @param size desired text size in px
      */
-    fun setChevronSize(size: Int) {
-        chevronSize = size
+    fun setArrowsSize(size: Int) {
+        arrowsSize = size
         invalidate()
     }
 
@@ -394,8 +394,8 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
      * Set side margin of the arrows that switch dates
      * @param margin desired margin in px
      */
-    fun setChevronSideMargin(margin: Int) {
-        chevronSideMargin = margin
+    fun setArrowsSideMargin(margin: Int) {
+        arrowsSideMargin = margin
         invalidate()
     }
 
@@ -403,8 +403,8 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
      * Set color of the arrows that switch dates
      * @param color desired color
      */
-    fun setChevronColor(@ColorInt color: Int) {
-        chevronColor = color
+    fun setArrowsColor(@ColorInt color: Int) {
+        arrowsColor = color
         invalidate()
     }
 
