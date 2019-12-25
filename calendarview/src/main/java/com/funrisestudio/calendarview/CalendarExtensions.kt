@@ -1,12 +1,12 @@
 package com.funrisestudio.calendarview
 
 import android.content.Context
+import android.os.Build
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
-import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 
 
@@ -53,13 +53,18 @@ fun View.color(@ColorRes colorId: Int): Int {
 }
 
 @ColorInt
-fun Context.getThemeColor(@AttrRes attrId: Int): Int {
+fun Context.getAccentColor(): Int {
+    val attrId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        android.R.attr.colorAccent
+    } else {
+        resources.getIdentifier("colorAccent", "attr", packageName)
+    }
     val value = TypedValue()
     theme.resolveAttribute(attrId, value, true)
     return value.data
 }
 
 @ColorInt
-fun View.getThemeColor(@AttrRes attrId: Int): Int {
-    return context.getThemeColor(attrId)
+fun View.getAccentColor(): Int {
+    return context.getAccentColor()
 }

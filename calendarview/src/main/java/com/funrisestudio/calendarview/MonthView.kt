@@ -19,7 +19,7 @@ class MonthView: View {
             return context.color(android.R.color.white)
         }
         internal fun getDefaultSelectionColor(context: Context): Int {
-            return context.getThemeColor(android.R.attr.colorAccent)
+            return context.getAccentColor()
         }
         internal fun getDefaultHighlightColor(context: Context): Int {
             return context.color(R.color.colorGreyHighlight)

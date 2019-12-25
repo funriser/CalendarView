@@ -1,13 +1,13 @@
 package com.funrisestudio.calendarview
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
@@ -184,7 +184,9 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
         chevronLeftLP.height = arrowsSize
         chevronLeftLP.marginStart = arrowsSideMargin
         ibChevron.layoutParams = chevronLeftLP
-        ibChevron.imageTintList = ColorStateList.valueOf(arrowsColor)
+
+        val newDrawable = DrawableCompat.wrap(ibChevron.drawable)
+        DrawableCompat.setTint(newDrawable.mutate(), arrowsColor)
     }
 
     override fun onCreateMonthView(context: Context, monthData: MonthData): MonthView {
