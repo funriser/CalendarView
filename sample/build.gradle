@@ -9,8 +9,8 @@ android {
         applicationId "com.funrisestudio.calendarviewsample"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 3
-        versionName "0.2.1"
+        versionCode 4
+        versionName "0.2.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
