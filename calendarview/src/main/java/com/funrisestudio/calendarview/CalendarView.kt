@@ -1,5 +1,6 @@
 package com.funrisestudio.calendarview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -104,9 +105,10 @@ class CalendarView : LinearLayout {
         setMonthTitle(monthData)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setMonthTitle(monthData: MonthData) {
         val monthName = CalendarAPI.getMonthName(monthData.month)
-        tvMonthTitle.text = monthName
+        tvMonthTitle.text = "$monthName ${monthData.year}"
     }
 
     constructor(ctx: Context) : super(ctx) {
