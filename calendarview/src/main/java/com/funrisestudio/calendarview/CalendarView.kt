@@ -36,11 +36,7 @@ class CalendarView : LinearLayout {
     var onDateSelected: ((Date) -> Unit)? = null
         set(value) {
             field = value
-            monthAdapter.onDateSelected = {
-                //reset current selected date
-                selectedDate = it
-                value?.invoke(it)
-            }
+            monthAdapter.onDateSelected = value
         }
 
     var highlightedDates: List<Date>? = null
@@ -49,10 +45,13 @@ class CalendarView : LinearLayout {
             monthAdapter.highlightedDates = value
         }
 
-    internal var selectedDate: Date? = null
+    var selectedDate: Date? = null
+        get() = monthAdapter.selectedDate
         set(value) {
             field = value
-            monthAdapter.selectedDate = value
+            value?.let {
+                monthAdapter.setNewSelectedDate(it)
+            }
         }
 
     var onMonthChanged: ((monthStart: Date) -> Unit)? = null
@@ -419,15 +418,6 @@ class CalendarView : LinearLayout {
     fun setArrowsColor(@ColorInt color: Int) {
         arrowsColor = color
         invalidate()
-    }
-
-    /**
-     * Set current selected date
-     * Selected day is marked by a primary indicator
-     */
-    fun setSelectedDate(date: Date) {
-        selectedDate = date
-        monthAdapter.setNewSelectedDate(date)
     }
 
     override fun invalidate() {

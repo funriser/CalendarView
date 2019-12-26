@@ -14,7 +14,7 @@ class MonthAdapter: PagerAdapter() {
         set(value) {
             field = value
             monthViews.forEach {
-                it.value.onDateSelected = value
+                it.value.onDateSelected = ::onNewDateSelected
             }
         }
 
@@ -37,8 +37,8 @@ class MonthAdapter: PagerAdapter() {
             }
         }
 
-    internal var selectedDate: Date? = null
-        set(value) {
+    var selectedDate: Date? = null
+        private set(value) {
             field?.let {
                 //TODO("Remove redundant month data calculation")
                 //it would be better to pass it in the month view callback
@@ -71,7 +71,7 @@ class MonthAdapter: PagerAdapter() {
         selectedDate?.let {
             setMonthSelectedDate(monthView, monthData, it)
         }
-        monthView.onDateSelected = this@MonthAdapter.onDateSelected
+        monthView.onDateSelected = ::onNewDateSelected
     }
 
     private fun setMonthSelectedDate(monthView: MonthView, monthData: MonthData, selectedDate: Date) {
@@ -88,6 +88,11 @@ class MonthAdapter: PagerAdapter() {
                 monthView.highLightedDates = filteredDates
             }
         }
+    }
+
+    private fun onNewDateSelected(date: Date) {
+        selectedDate = date
+        onDateSelected?.invoke(date)
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -116,7 +121,7 @@ class MonthAdapter: PagerAdapter() {
     }
 
     internal fun setNewSelectedDate(date: Date) {
-        selectedDate = date
+        onNewDateSelected(date)
         monthViews.forEach {
             val monthView = it.value
             val monthData = monthView.dateMatrix.monthData
