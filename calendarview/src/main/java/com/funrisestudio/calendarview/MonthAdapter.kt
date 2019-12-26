@@ -6,33 +6,73 @@ import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import java.util.*
 
-class MonthAdapter(private val monthOwner: MonthOwner): PagerAdapter() {
+class MonthAdapter: PagerAdapter() {
 
-    var onDateSelected: ((Date) -> Unit)? = null
+    internal var onDateSelected: ((Date) -> Unit)? = null
+        set(value) {
+            field = value
+            monthViews.forEach {
+                it.value.onDateSelected = value
+            }
+        }
 
-    var highlightedDates: List<Date>? = null
+    internal var monthViewParams: MonthView.Params? = null
+        set(value) {
+            field = value
+            value?:return
+            monthViews.forEach {
+                it.value.setMonthParams(value)
+            }
+        }
+
+    internal var highlightedDates: List<Date>? = null
+        set(value) {
+            field = value
+            monthViews.forEach {
+                val monthView = it.value
+                val monthData = monthView.dateMatrix.monthData
+                setMonthHighlightedDates(monthView, monthData)
+            }
+        }
+
+    internal var selectedDate: Date? = null
 
     private val monthViews = hashMapOf<Int, MonthView>()
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val monthData = getMonthData(position)
-        val monthView = monthOwner.onCreateMonthView(container.context, monthData)
+        val monthView = getMonthView(container.context, monthData)
         bindMonthView(monthView, monthData)
         monthViews[position] = monthView
         container.addView(monthView)
         return monthView
     }
 
+    private fun getMonthView(context: Context, monthData: MonthData): MonthView {
+        return MonthView(context, monthViewParams!!, monthData)
+    }
+
     private fun bindMonthView(monthView: MonthView, monthData: MonthData) {
-        monthView.apply {
-            highlightedDates?.let {
-                val filteredDates =
-                    CalendarAPI.filterByMonth(it, monthData)
-                if (filteredDates.isNotEmpty()) {
-                    this.highLightedDates = filteredDates
-                }
+        setMonthHighlightedDates(monthView, monthData)
+        selectedDate?.let {
+            setMonthSelectedDate(monthView, monthData, it)
+        }
+        monthView.onDateSelected = this@MonthAdapter.onDateSelected
+    }
+
+    private fun setMonthSelectedDate(monthView: MonthView, monthData: MonthData, selectedDate: Date) {
+        if (CalendarAPI.isMonthMatching(selectedDate, monthData)) {
+            monthView.selectedDate = selectedDate
+        }
+    }
+
+    private fun setMonthHighlightedDates(monthView: MonthView, monthData: MonthData) {
+        highlightedDates?.let {
+            val filteredDates =
+                CalendarAPI.filterByMonth(it, monthData)
+            if (filteredDates.isNotEmpty()) {
+                monthView.highLightedDates = filteredDates
             }
-            onDateSelected = this@MonthAdapter.onDateSelected
         }
     }
 
@@ -61,16 +101,13 @@ class MonthAdapter(private val monthOwner: MonthOwner): PagerAdapter() {
         return (monthData.year - 1) * 12 + monthData.month
     }
 
-    internal fun invalidatePageParams(monthViewParams: MonthView.Params) {
+    internal fun setNewSelectedDate(date: Date) {
+        selectedDate = date
         monthViews.forEach {
-            it.value.invalidateParams(monthViewParams)
+            val monthView = it.value
+            val monthData = monthView.dateMatrix.monthData
+            setMonthSelectedDate(monthView, monthData, date)
         }
-    }
-
-    interface MonthOwner {
-
-        fun onCreateMonthView(context: Context, monthData: MonthData): MonthView
-
     }
 
 }

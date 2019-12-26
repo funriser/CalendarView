@@ -74,7 +74,7 @@ class MonthView: View {
 
     }
 
-    private var dateMatrix = MonthMatrix(Calendar.JULY, 2019)
+    internal var dateMatrix = MonthMatrix(Calendar.JULY, 2019)
     private var currentCells: List<List<DateCell?>> = emptyList()
     private var weekDayTitleCells: List<WeekDayCell> = emptyList()
 
@@ -84,7 +84,34 @@ class MonthView: View {
             init()
         }
 
-    private var selectedDate: DateCell? = null
+    internal var selectedDate: Date? = null
+        set(value) {
+            field = value
+            value?:return
+            forEachCell {
+                it?:return@forEachCell
+                if (isMonthDaySelectedSelected(it.number, value)) {
+                    setDateCellSelected(it)
+                }
+            }
+        }
+
+    private var selectedDateCell: DateCell? = null
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    internal var highLightedDates: List<Date>? = null
+        set(value) {
+            field = value
+            if (currentCells.isNotEmpty() && value != null) {
+                applyHighlightedDates(value)
+            }
+            invalidate()
+        }
+
+    internal var onDateSelected: ((Date) -> Unit)? = null
 
     private lateinit var paintDateText: Paint
     private lateinit var paintSelectedDateText: Paint
@@ -93,15 +120,6 @@ class MonthView: View {
     private lateinit var paintWeekDayTitle: Paint
 
     private val textRectBuf = Rect()
-
-    internal var onDateSelected: ((Date) -> Unit)? = null
-    internal var highLightedDates: List<Date>? = null
-        set(value) {
-            field = value
-            if (currentCells.isNotEmpty() && value != null) {
-                applyHighlightedDates(value)
-            }
-        }
 
     constructor(ctx: Context) : super(ctx) {
         params = getDefaultParams(ctx)
@@ -238,18 +256,22 @@ class MonthView: View {
     }
 
     private fun onCellTouched(dateCell: DateCell) {
-        if (dateCell == selectedDate) {
-            return
-        }
-        dateCell.isSelected = true
-        selectedDate?.isSelected = false
-        selectedDate = dateCell
+        setDateCellSelected(dateCell)
         val selectedDate = CalendarAPI.getDate(
             dateMatrix.monthData,
             dateCell.number
         )
         onDateSelected?.invoke(selectedDate)
         invalidate()
+    }
+
+    private fun setDateCellSelected(dateCell: DateCell) {
+        if (dateCell == selectedDateCell) {
+            return
+        }
+        dateCell.isSelected = true
+        selectedDateCell?.isSelected = false
+        selectedDateCell = dateCell
     }
 
     private inline fun forEachCell(action: (DateCell?) -> Unit) {
@@ -281,7 +303,15 @@ class MonthView: View {
                 val t = currY
                 val b = currY + cellHeight
                 val cellRect = RectF(l, t, r, b)
-                val newCell = DateCell(cellRect, dateNumber)
+                val isSelected = if (selectedDate == null) {
+                    false
+                } else {
+                    isMonthDaySelectedSelected(dateNumber, selectedDate!!)
+                }
+                val newCell = DateCell(cellRect, dateNumber, isSelected)
+                if (isSelected) {
+                    setDateCellSelected(newCell)
+                }
                 dateNumber ++
                 currX += cellWidth
                 return@cellBuilder newCell
@@ -331,11 +361,17 @@ class MonthView: View {
         invalidate()
     }
 
+    private fun isMonthDaySelectedSelected(monthDayNumber: Int, selectedDate: Date): Boolean {
+        val monthData = dateMatrix.monthData
+        val dayOfMonthData = DayOfMonthData(monthData, monthDayNumber)
+        return CalendarAPI.isDateMatching(selectedDate, dayOfMonthData)
+    }
+
     private fun measureText(text: String, paint: Paint, rect: Rect) {
         paint.getTextBounds(text, 0, text.length, rect)
     }
 
-    fun invalidateParams(params: Params) {
+    fun setMonthParams(params: Params) {
         this.params = params
         invalidate()
     }

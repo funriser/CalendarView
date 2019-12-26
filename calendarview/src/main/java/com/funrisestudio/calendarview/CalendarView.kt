@@ -16,7 +16,7 @@ import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.layout_calendar_view.view.*
 import java.util.*
 
-class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
+class CalendarView : LinearLayout {
 
     private var textMonthSize = sp(14f)
     private var textMonthColor = color(android.R.color.black)
@@ -25,17 +25,22 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     private var arrowsColor = color(android.R.color.black)
     private var arrowsSideMargin = dip(12)
 
-    private val monthAdapter = MonthAdapter(this)
+    private val monthAdapter = MonthAdapter()
+
     private var monthViewParams: MonthView.Params
         set(value) {
             field = value
-            monthAdapter.invalidatePageParams(value)
+            monthAdapter.monthViewParams = value
         }
 
     var onDateSelected: ((Date) -> Unit)? = null
         set(value) {
             field = value
-            monthAdapter.onDateSelected = value
+            monthAdapter.onDateSelected = {
+                //reset current selected date
+                selectedDate = it
+                value?.invoke(it)
+            }
         }
 
     var highlightedDates: List<Date>? = null
@@ -43,6 +48,14 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
             field = value
             monthAdapter.highlightedDates = value
         }
+
+    internal var selectedDate: Date? = null
+        set(value) {
+            field = value
+            monthAdapter.selectedDate = value
+        }
+
+    var onMonthChanged: ((monthStart: Date) -> Unit)? = null
 
     private val monthChangeListener = object : ViewPager.OnPageChangeListener {
 
@@ -59,7 +72,9 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
         }
 
         override fun onPageSelected(position: Int) {
-            setMonthTitle(position)
+            val monthData = monthAdapter.getMonthData(position)
+            setMonthTitle(monthData)
+            onMonthChanged?.invoke(CalendarAPI.getMonthStartDate(monthData))
         }
 
     }
@@ -187,10 +202,6 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
         val newDrawable = DrawableCompat.wrap(ibChevron.drawable)
         DrawableCompat.setTint(newDrawable.mutate(), arrowsColor)
-    }
-
-    override fun onCreateMonthView(context: Context, monthData: MonthData): MonthView {
-        return MonthView(context, monthViewParams, monthData)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -324,8 +335,7 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
     /**
      * Set color for the mark that indicates that the day of month is selected
-     * Selected date represents date that was selected by user with touch interaction
-     * Selected date shows the color indicator
+     * Selected day is marked by a primary indicator
      * @param color desired color
      */
     fun setSelectionColor(@ColorInt color: Int) {
@@ -334,7 +344,7 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
 
     /**
      * Set color for the mark that indicates that the day of month is highlighted
-     * Highlighted date shows the color indicator
+     * Highlighted day is marked by a secondary indicator
      * @param color desired color
      */
     fun setHighlightColor(@ColorInt color: Int) {
@@ -408,6 +418,15 @@ class CalendarView : LinearLayout, MonthAdapter.MonthOwner {
     fun setArrowsColor(@ColorInt color: Int) {
         arrowsColor = color
         invalidate()
+    }
+
+    /**
+     * Set current selected date
+     * Selected day is marked by a primary indicator
+     */
+    fun setSelectedDate(date: Date) {
+        selectedDate = date
+        monthAdapter.setNewSelectedDate(date)
     }
 
     override fun invalidate() {

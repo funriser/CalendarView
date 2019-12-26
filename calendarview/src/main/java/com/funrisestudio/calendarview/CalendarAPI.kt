@@ -89,7 +89,7 @@ object CalendarAPI {
         }
     }
 
-    private fun isMonthMatching(date: Date, monthData: MonthData): Boolean {
+    fun isMonthMatching(date: Date, monthData: MonthData): Boolean {
         val calendar1 = Calendar.getInstance().apply {
             time = date
         }
@@ -108,6 +108,12 @@ object CalendarAPI {
             set(Calendar.MONTH, monthData.month)
             set(Calendar.YEAR, monthData.year)
         }
+    }
+
+    fun getMonthStartDate(monthData: MonthData): Date {
+        return getCalendar(monthData).apply {
+            set(Calendar.DAY_OF_MONTH, 1)
+        }.time
     }
 
     fun getDate(monthData: MonthData): Date {
