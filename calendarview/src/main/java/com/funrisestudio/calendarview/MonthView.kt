@@ -87,7 +87,11 @@ class MonthView: View {
     internal var selectedDate: Date? = null
         set(value) {
             field = value
-            value?:return
+            if (value == null) {
+                selectedDateCell?.isSelected = false
+                selectedDateCell = null
+                return
+            }
             forEachCell {
                 it?:return@forEachCell
                 if (isMonthDaySelectedSelected(it.number, value)) {

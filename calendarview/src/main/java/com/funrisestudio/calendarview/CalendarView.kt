@@ -72,6 +72,7 @@ class CalendarView : LinearLayout {
         }
 
         override fun onPageSelected(position: Int) {
+            monthAdapter.currentPosition = position
             val monthData = monthAdapter.getMonthData(position)
             setMonthTitle(monthData)
             onMonthChanged?.invoke(CalendarAPI.getMonthStartDate(monthData))

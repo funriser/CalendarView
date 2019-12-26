@@ -8,6 +8,8 @@ import java.util.*
 
 class MonthAdapter: PagerAdapter() {
 
+    internal var currentPosition = -1
+
     internal var onDateSelected: ((Date) -> Unit)? = null
         set(value) {
             field = value
@@ -36,6 +38,18 @@ class MonthAdapter: PagerAdapter() {
         }
 
     internal var selectedDate: Date? = null
+        set(value) {
+            field?.let {
+                //TODO("Remove redundant month data calculation")
+                //it would be better to pass it in the month view callback
+                val selectedMonthData = CalendarAPI.getMonthData(it)
+                val selectedPosition = getPosition(selectedMonthData)
+                if (selectedPosition != currentPosition) {
+                    monthViews[selectedPosition]?.selectedDate = null
+                }
+            }
+            field = value
+        }
 
     private val monthViews = hashMapOf<Int, MonthView>()
 

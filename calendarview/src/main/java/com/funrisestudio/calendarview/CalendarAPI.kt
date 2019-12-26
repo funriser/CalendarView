@@ -110,6 +110,15 @@ object CalendarAPI {
         }
     }
 
+    fun getMonthData(date: Date): MonthData {
+        val calendar = Calendar.getInstance().apply {
+            time = date
+        }
+        val month = calendar.get(Calendar.MONTH)
+        val year = calendar.get(Calendar.YEAR)
+        return MonthData(month, year)
+    }
+
     fun getMonthStartDate(monthData: MonthData): Date {
         return getCalendar(monthData).apply {
             set(Calendar.DAY_OF_MONTH, 1)
