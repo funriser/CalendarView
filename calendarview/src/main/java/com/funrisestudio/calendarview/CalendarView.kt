@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -25,6 +26,7 @@ class CalendarView : LinearLayout {
     private var arrowsSize = dip(30)
     private var arrowsColor = color(android.R.color.black)
     private var arrowsSideMargin = dip(12)
+    private var monthHeaderGravity = MonthHeaderGravity.CENTER
 
     private val monthAdapter = MonthAdapter()
 
@@ -126,6 +128,8 @@ class CalendarView : LinearLayout {
                 arrowsSize = getDimension(R.styleable.CalendarView_arrowsSize, arrowsSize.toFloat()).toInt()
                 arrowsSideMargin = getDimension(R.styleable.CalendarView_arrowsSideMargin, arrowsSideMargin.toFloat()).toInt()
                 arrowsColor = getColor(R.styleable.CalendarView_arrowsColor, arrowsColor)
+                val monthHeaderGravityValue = getInt(R.styleable.CalendarView_monthHeaderGravity, MonthHeaderGravity.CENTER.ordinal)
+                monthHeaderGravity = MonthHeaderGravity.getByOrdinal(monthHeaderGravityValue)
                 monthViewParams = MonthView.Params(
                     textDayColor = getColor(
                         R.styleable.CalendarView_textDayColor,
@@ -186,6 +190,7 @@ class CalendarView : LinearLayout {
     }
 
     private fun init() {
+        setMonthHeaderParams(monthHeaderGravity)
         tvMonthTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, textMonthSize)
         tvMonthTitle.setTextColor(textMonthColor)
         val lpMonthView = pagerMonth.layoutParams as MarginLayoutParams
@@ -204,6 +209,23 @@ class CalendarView : LinearLayout {
 
         val newDrawable = DrawableCompat.wrap(ibChevron.drawable)
         DrawableCompat.setTint(newDrawable.mutate(), arrowsColor)
+    }
+
+    private fun setMonthHeaderParams(monthHeaderGravity: MonthHeaderGravity) {
+        val lpMonthHeader = when(monthHeaderGravity) {
+            MonthHeaderGravity.CENTER -> return
+            MonthHeaderGravity.START -> {
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                    gravity = Gravity.START
+                }
+            }
+            MonthHeaderGravity.END -> {
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                    gravity = Gravity.END
+                }
+            }
+        }
+        layoutMonthHeader.layoutParams = lpMonthHeader
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -256,7 +278,8 @@ class CalendarView : LinearLayout {
         val tvWidthSpec = MeasureSpec.makeMeasureSpec(parentWidth, MeasureSpec.AT_MOST)
         val tvHeightSpec = MeasureSpec.makeMeasureSpec(parentHeight, MeasureSpec.AT_MOST)
         tvMonthTitle.measure(tvWidthSpec, tvHeightSpec)
-        return parentHeight - tvMonthTitle.measuredHeight - textMonthMargin
+        //10 is to optimize height measurements with linear layout
+        return parentHeight - tvMonthTitle.measuredHeight - textMonthMargin - 10
     }
 
     private fun getExactPagerDimension(availableDimension: Int): Int {

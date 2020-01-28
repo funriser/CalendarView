@@ -5,6 +5,11 @@
         <attr name="textMonthSize" format="dimension"/>
         <attr name="textMonthMargin" format="dimension"/>
         <attr name="textMonthColor" format="color" />
+        <attr name="monthHeaderGravity" format="enum">
+            <enum name="center" value="0"/>
+            <enum name="start" value="1"/>
+            <enum name="end" value="2"/>
+        </attr>
         <!-- Arrows customization -->
         <attr name="arrowsSize" format="dimension"/>
         <attr name="arrowsColor" format="color" />
