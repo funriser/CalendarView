@@ -60,4 +60,10 @@ class CalendarTest {
         )
     }
 
+    @Test
+    fun `should get month name correctly (february)`() {
+        val monthName = CalendarAPI.getMonthName(1)
+        assertEquals("February", monthName)
+    }
+
 }

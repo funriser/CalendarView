@@ -8,8 +8,15 @@ object CalendarAPI {
     private const val FORMAT_MONTH_LONG = "MMMM"
     private const val FORMAT_WEEK_DAY_SHORT = "E"
 
+    private val current: Calendar
+        get() {
+            return Calendar.getInstance().apply {
+                isLenient = false
+            }
+        }
+
     fun getFirstWeekDayOfMonth(month: Int, year: Int): Int {
-        val calendar = Calendar.getInstance().apply {
+        val calendar = current.apply {
             clearTime()
             set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.MONTH, month)
@@ -19,17 +26,19 @@ object CalendarAPI {
     }
 
     fun getLastWeekDayOfMonth(month: Int, year: Int): Int {
-        val calendar = Calendar.getInstance().apply {
+        val calendar = current.apply {
             clearTime()
             set(Calendar.MONTH, month)
             set(Calendar.YEAR, year)
+            //to avoid incorrect month calculation after getting day from default instance
+            set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
         }
         return calendar.get(Calendar.DAY_OF_WEEK)
     }
 
     fun getWeeksCount(month: Int, year: Int): Int {
-        val calendar = Calendar.getInstance().apply {
+        val calendar = current.apply {
             clearTime()
             set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.MONTH, month)
@@ -39,8 +48,9 @@ object CalendarAPI {
     }
 
     fun getMonthName(month: Int): String {
-        val date = Calendar.getInstance().apply {
+        val date = current.apply {
             clearTime()
+            set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.MONTH, month)
         }.time
         return SimpleDateFormat(FORMAT_MONTH_LONG, Locale.getDefault()).format(date)
@@ -48,7 +58,7 @@ object CalendarAPI {
 
     //takes params from 0 to 6
     fun getWeekDayShortName(weekDay: Int): String {
-        val date = Calendar.getInstance().apply {
+        val date = current.apply {
             clearTime()
             set(Calendar.DAY_OF_WEEK, weekDay + 1)
         }.time
@@ -56,7 +66,7 @@ object CalendarAPI {
     }
 
     fun getCurrentMonthData(): MonthData {
-        val calendar = Calendar.getInstance()
+        val calendar = current
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         return MonthData(month, year)
@@ -69,10 +79,10 @@ object CalendarAPI {
     }
 
     fun isDateMatching(date: Date, dayOfMonthData: DayOfMonthData): Boolean {
-        val calendar1 = Calendar.getInstance().apply {
+        val calendar1 = current.apply {
             time = date
         }
-        val calendar2 = Calendar.getInstance().apply {
+        val calendar2 = current.apply {
             clearTime()
             set(Calendar.DAY_OF_MONTH, dayOfMonthData.dayNumber)
             set(Calendar.MONTH, dayOfMonthData.monthData.month)
@@ -90,11 +100,12 @@ object CalendarAPI {
     }
 
     fun isMonthMatching(date: Date, monthData: MonthData): Boolean {
-        val calendar1 = Calendar.getInstance().apply {
+        val calendar1 = current.apply {
             time = date
         }
-        val calendar2 = Calendar.getInstance().apply {
+        val calendar2 = current.apply {
             clearTime()
+            set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.MONTH, monthData.month)
             set(Calendar.YEAR, monthData.year)
         }
@@ -103,15 +114,16 @@ object CalendarAPI {
     }
 
     fun getCalendar(monthData: MonthData): Calendar {
-        return Calendar.getInstance().apply {
+        return current.apply {
             clearTime()
+            set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.MONTH, monthData.month)
             set(Calendar.YEAR, monthData.year)
         }
     }
 
     fun getMonthData(date: Date): MonthData {
-        val calendar = Calendar.getInstance().apply {
+        val calendar = current.apply {
             time = date
         }
         val month = calendar.get(Calendar.MONTH)
@@ -123,10 +135,6 @@ object CalendarAPI {
         return getCalendar(monthData).apply {
             set(Calendar.DAY_OF_MONTH, 1)
         }.time
-    }
-
-    fun getDate(monthData: MonthData): Date {
-        return getCalendar(monthData).time
     }
 
 }
