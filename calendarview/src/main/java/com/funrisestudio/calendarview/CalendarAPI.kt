@@ -7,6 +7,7 @@ object CalendarAPI {
 
     private const val FORMAT_MONTH_LONG = "MMMM"
     private const val FORMAT_WEEK_DAY_SHORT = "E"
+    const val DAYS_IN_WEEK = 7
 
     private val current: Calendar
         get() {
@@ -15,17 +16,17 @@ object CalendarAPI {
             }
         }
 
-    fun getFirstWeekDayOfMonth(month: Int, year: Int): Int {
+    fun getFirstWeekDayOfMonthIndex(month: Int, year: Int): Int {
         val calendar = current.apply {
             clearTime()
             set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.MONTH, month)
             set(Calendar.YEAR, year)
         }
-        return calendar.get(Calendar.DAY_OF_WEEK)
+        return getDayOfWeekIndex(calendar)
     }
 
-    fun getLastWeekDayOfMonth(month: Int, year: Int): Int {
+    fun getLastWeekDayOfMonthIndex(month: Int, year: Int): Int {
         val calendar = current.apply {
             clearTime()
             set(Calendar.MONTH, month)
@@ -34,7 +35,25 @@ object CalendarAPI {
             set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
         }
-        return calendar.get(Calendar.DAY_OF_WEEK)
+        return getDayOfWeekIndex(calendar)
+    }
+
+    private fun getDayOfWeekIndex(calendar: Calendar): Int {
+        val diff = calendar.get(Calendar.DAY_OF_WEEK) - calendar.firstDayOfWeek
+        return if (diff < 0) {
+            return DAYS_IN_WEEK + diff
+        } else {
+            diff
+        }
+    }
+
+    private fun getDayOfWeekFromIndex(calendar: Calendar, i: Int): Int {
+        val pos = i + calendar.firstDayOfWeek
+        return if (pos <= DAYS_IN_WEEK) {
+            pos
+        } else {
+            pos - DAYS_IN_WEEK
+        }
     }
 
     fun getWeeksCount(month: Int, year: Int): Int {
@@ -44,7 +63,11 @@ object CalendarAPI {
             set(Calendar.MONTH, month)
             set(Calendar.YEAR, year)
         }
-        return calendar.getActualMaximum(Calendar.WEEK_OF_MONTH)
+        return if (calendar.get(Calendar.WEEK_OF_MONTH) != 0) {
+            calendar.getActualMaximum(Calendar.WEEK_OF_MONTH)
+        } else {
+            calendar.getActualMaximum(Calendar.WEEK_OF_MONTH) + 1
+        }
     }
 
     fun getMonthName(month: Int): String {
@@ -60,7 +83,8 @@ object CalendarAPI {
     fun getWeekDayShortName(weekDay: Int): String {
         val date = current.apply {
             clearTime()
-            set(Calendar.DAY_OF_WEEK, weekDay + 1)
+            val dayOfWeek = getDayOfWeekFromIndex(this, weekDay)
+            set(Calendar.DAY_OF_WEEK, dayOfWeek)
         }.time
         return SimpleDateFormat(FORMAT_WEEK_DAY_SHORT, Locale.getDefault()).format(date)
     }
