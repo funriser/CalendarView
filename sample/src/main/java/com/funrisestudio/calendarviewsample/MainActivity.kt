@@ -8,9 +8,9 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val date1 = getDate(1, 11, 2019)
-    private val date2 = getDate(1, 0, 2020)
-    private val date3 = getDate(2, 0, 2020)
+    private val date1 = getDate(1, 2, 2020)
+    private val date2 = getDate(1, 3, 2020)
+    private val date3 = getDate(2, 3, 2020)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -294,7 +294,7 @@ class MonthView: View {
         var currX = startX
         var currY = startY
         val cellWidth = width.toFloat() / MonthMatrix.DATE_ROW_LEN
-        val cellHeight = height.toFloat() / dateMatrix.length
+        val cellHeight = height.toFloat() / MonthMatrix.MAX_ROWS
 
         return List(dateMatrix.length) { i ->
             val dateRow = List(7) cellBuilder@ { j: Int ->

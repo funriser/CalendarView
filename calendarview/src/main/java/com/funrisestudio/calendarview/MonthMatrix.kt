@@ -31,9 +31,8 @@ class MonthMatrix(internal val monthData: MonthData) {
     }
 
     companion object {
-
         const val DATE_ROW_LEN = 7
-
+        const val MAX_ROWS = 6
     }
 
 }
