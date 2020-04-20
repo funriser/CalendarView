@@ -2,6 +2,7 @@ package com.funrisestudio.calendarview
 
 import android.content.Context
 import android.graphics.*
+import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -27,8 +28,8 @@ class MonthView: View {
         internal fun getDefaultTextWeekdayColor(context: Context): Int {
             return context.color(R.color.colorWeekdayText)
         }
-        internal fun getDefaultMarginWeekdayTop(context: Context): Int {
-            return context.dip(15)
+        internal fun getDefaultMarginWeekdayBottom(context: Context): Int {
+            return context.dip(5)
         }
         internal fun getDefaultTextDaySize(context: Context): Float {
             return context.sp(12f)
@@ -60,7 +61,7 @@ class MonthView: View {
                 textDaySize = getDefaultTextDaySize(
                     context
                 ),
-                marginWeekdayTop = getDefaultMarginWeekdayTop(
+                marginWeekdayBottom = getDefaultMarginWeekdayBottom(
                     context
                 ),
                 paddingSelection = getDefaultPaddingSelection(
@@ -117,13 +118,11 @@ class MonthView: View {
 
     internal var onDateSelected: ((Date) -> Unit)? = null
 
-    private lateinit var paintDateText: Paint
-    private lateinit var paintSelectedDateText: Paint
+    private lateinit var paintDateText: TextPaint
+    private lateinit var paintSelectedDateText: TextPaint
     private lateinit var paintCellSelection: Paint
     private lateinit var paintCellHighlight: Paint
-    private lateinit var paintWeekDayTitle: Paint
-
-    private val textRectBuf = Rect()
+    private lateinit var paintWeekDayTitle: TextPaint
 
     constructor(ctx: Context) : super(ctx) {
         params = getDefaultParams(ctx)
@@ -139,13 +138,15 @@ class MonthView: View {
     }
 
     private fun init() {
-        paintDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        paintDateText = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = params.textDayColor
             this.textSize = params.textDaySize
+            this.textAlign = Paint.Align.CENTER
         }
-        paintSelectedDateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        paintSelectedDateText = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = params.textDayColorSelected
             this.textSize = params.textDaySize
+            this.textAlign = Paint.Align.CENTER
         }
         paintCellSelection = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = params.selectionColor
@@ -153,15 +154,16 @@ class MonthView: View {
         paintCellHighlight = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = params.highlightColor
         }
-        paintWeekDayTitle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        paintWeekDayTitle = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = params.textWeekdayColor
             this.textSize = params.textWeekdaySize
+            this.textAlign = Paint.Align.CENTER
         }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        val weekDayTitleHeight = getWeekDateTitlesHeight()
+        val weekDayTitleHeight = getWeekDayCellHeight()
         weekDayTitleCells = getWeekDaysTitleCells(w, weekDayTitleHeight)
         currentCells = getCurrentCells(
             startX = 0f,
@@ -172,6 +174,11 @@ class MonthView: View {
         highLightedDates?.let {
             applyHighlightedDates(it)
         }
+    }
+
+    private fun getWeekDayCellHeight(): Int {
+        val textHeight = (paintWeekDayTitle.descent() - paintWeekDayTitle.ascent()).toInt()
+        return textHeight + params.marginWeekdayBottom
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -202,29 +209,18 @@ class MonthView: View {
         c: Canvas, text: String,
         rect: RectF, paint: Paint
     ) {
-        measureText(text, paint, textRectBuf)
-
-        val centerX = rect.left + rect.width() / 2
-        val centerY = rect.top + rect.height() / 2
-
-        val textX = centerX - textRectBuf.width() / 2 - textRectBuf.left
-        val textY = centerY + textRectBuf.height() / 2 - textRectBuf.bottom
-
-        c.drawText(text, textX, textY, paint)
+        val tHeight = paint.descent() - paint.ascent()
+        val tOffset = (tHeight / 2) - paint.descent()
+        c.drawText(text, rect.centerX(), rect.centerY() + tOffset, paint)
     }
 
     private fun drawTextInsideRectTopAlign(
         c: Canvas, text: String,
-        rect: RectF, paint: Paint
+        rect: RectF, paint: TextPaint
     ) {
-        measureText(text, paint, textRectBuf)
-
-        val centerX = rect.left + rect.width() / 2
-
-        val textX = centerX - textRectBuf.width() / 2 - textRectBuf.left
-        val textY = rect.top + textRectBuf.height() - textRectBuf.bottom
-
-        c.drawText(text, textX, textY, paint)
+        val decorOffset = 1
+        val baselineY = rect.top - paint.ascent() - paint.descent() + decorOffset
+        c.drawText(text, rect.centerX(), baselineY, paint)
     }
 
     private fun drawCircleInsideRectangle(c: Canvas, rect: RectF, paint: Paint, padding: Int = 0) {
@@ -326,11 +322,11 @@ class MonthView: View {
         }
     }
 
-    private fun getWeekDaysTitleCells(width: Int, textHeight: Int): List<WeekDayCell> {
+    private fun getWeekDaysTitleCells(width: Int, cellHeight: Int): List<WeekDayCell> {
         val cellWidth = width.toFloat() / MonthMatrix.DATE_ROW_LEN
         var currX = 0f
         val t = 0f
-        val b = t + textHeight
+        val b = t + cellHeight
         return List(MonthMatrix.DATE_ROW_LEN) {
             val l = currX
             val r = currX + cellWidth
@@ -339,14 +335,6 @@ class MonthView: View {
             val weekDayTitleRect = RectF(l, t, r, b)
             return@List WeekDayCell(weekDayTitle, weekDayTitleRect)
         }
-    }
-
-    private fun getWeekDateTitlesHeight(): Int {
-        val weekDayTextSample =
-            CalendarAPI.getWeekDayShortName(0) //get localed week day text sample
-        val textRect = Rect()
-        measureText(weekDayTextSample, paintWeekDayTitle, textRect)
-        return textRect.height() + params.marginWeekdayTop
     }
 
     private fun applyHighlightedDates(dates: List<Date>) {
@@ -371,10 +359,6 @@ class MonthView: View {
         return CalendarAPI.isDateMatching(selectedDate, dayOfMonthData)
     }
 
-    private fun measureText(text: String, paint: Paint, rect: Rect) {
-        paint.getTextBounds(text, 0, text.length, rect)
-    }
-
     fun setMonthParams(params: Params) {
         this.params = params
         invalidate()
@@ -388,7 +372,7 @@ class MonthView: View {
         internal var highlightColor: Int,
         internal var textWeekdaySize: Float,
         internal var textWeekdayColor: Int,
-        internal var marginWeekdayTop: Int,
+        internal var marginWeekdayBottom: Int,
         internal var paddingSelection: Int
     )
 

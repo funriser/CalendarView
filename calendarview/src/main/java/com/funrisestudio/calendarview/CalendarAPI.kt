@@ -1,11 +1,12 @@
 package com.funrisestudio.calendarview
 
+import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.*
 
 object CalendarAPI {
 
-    private const val FORMAT_MONTH_LONG = "MMMM"
+    private const val FORMAT_MONTH_STANDALONE = "LLLL"
     private const val FORMAT_WEEK_DAY_SHORT = "E"
     const val DAYS_IN_WEEK = 7
 
@@ -70,13 +71,16 @@ object CalendarAPI {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     fun getMonthName(month: Int): String {
         val date = current.apply {
             clearTime()
             set(Calendar.DAY_OF_MONTH, 1)
             set(Calendar.MONTH, month)
         }.time
-        return SimpleDateFormat(FORMAT_MONTH_LONG, Locale.getDefault()).format(date)
+        val sdf = SimpleDateFormat(FORMAT_MONTH_STANDALONE, Locale.getDefault())
+        val rowMonthName = sdf.format(date)
+        return rowMonthName.capitalize()
     }
 
     //takes params from 0 to 6
@@ -137,7 +141,7 @@ object CalendarAPI {
                 && calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)
     }
 
-    fun getCalendar(monthData: MonthData): Calendar {
+    private fun getCalendar(monthData: MonthData): Calendar {
         return current.apply {
             clearTime()
             set(Calendar.DAY_OF_MONTH, 1)

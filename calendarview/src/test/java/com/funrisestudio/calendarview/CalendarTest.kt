@@ -111,10 +111,17 @@ class CalendarTest {
     }
 
     @Test
-    fun `should get month name correctly (february)`() {
+    fun `should get month name correctly (february) in en`() {
         Locale.setDefault(Locale.ENGLISH)
         val monthName = CalendarAPI.getMonthName(1)
         assertEquals("February", monthName)
+    }
+
+    @Test
+    fun `should get month name correctly (february) in ru`() {
+        Locale.setDefault(Locale("ru", "RU"))
+        val monthName = CalendarAPI.getMonthName(1)
+        assertEquals("Февраль", monthName)
     }
 
     @Test

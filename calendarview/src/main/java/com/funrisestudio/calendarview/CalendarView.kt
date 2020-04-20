@@ -163,9 +163,9 @@ class CalendarView : LinearLayout {
                         R.styleable.CalendarView_textDaySize,
                         MonthView.getDefaultTextDaySize(ctx)
                     ),
-                    marginWeekdayTop = getDimension(
+                    marginWeekdayBottom = getDimension(
                         R.styleable.CalendarView_marginWeekdayTop,
-                        MonthView.getDefaultMarginWeekdayTop(
+                        MonthView.getDefaultMarginWeekdayBottom(
                             ctx
                         ).toFloat()
                     ).toInt(),
@@ -393,12 +393,12 @@ class CalendarView : LinearLayout {
     }
 
     /**
-     * Set margin between the text that displays week of month and
+     * Set margin between the text that displays day of week and
      * the text that represents days of month
-     * @param margin desired margin in px
+     * @param margin desired margin in dp
      */
-    fun setMarginWeekdayTop(margin: Int) {
-        monthViewParams = monthViewParams.copy(marginWeekdayTop = margin)
+    fun setMarginWeekdayBottom(margin: Int) {
+        monthViewParams = monthViewParams.copy(marginWeekdayBottom = margin)
     }
 
     /**
