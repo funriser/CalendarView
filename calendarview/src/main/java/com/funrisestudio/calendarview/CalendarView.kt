@@ -445,6 +445,17 @@ class CalendarView : LinearLayout {
         invalidate()
     }
 
+    /**
+     * @param gravity desired gravity
+     *      MonthHeaderGravity.CENTER - month title and arrows spread in center
+     *      MonthHeaderGravity.START - month title and arrows in the start corner
+     *      MonthHeaderGravity.END - month title and arrows in the end corner corner
+     */
+    fun setMonthHeaderGravity(gravity: MonthHeaderGravity) {
+        monthHeaderGravity = gravity
+        invalidate()
+    }
+
     override fun invalidate() {
         init()
         super.invalidate()
