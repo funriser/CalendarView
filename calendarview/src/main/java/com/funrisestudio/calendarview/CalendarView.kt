@@ -212,15 +212,20 @@ class CalendarView : LinearLayout {
     }
 
     private fun setMonthHeaderParams(monthHeaderGravity: MonthHeaderGravity) {
+        val packedWidth = context.resources.getDimensionPixelSize(R.dimen.month_header_packed_width)
         val lpMonthHeader = when(monthHeaderGravity) {
-            MonthHeaderGravity.CENTER -> return
+            MonthHeaderGravity.CENTER -> {
+                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+            }
             MonthHeaderGravity.START -> {
-                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                LayoutParams(packedWidth, LayoutParams.WRAP_CONTENT).apply {
                     gravity = Gravity.START
                 }
             }
             MonthHeaderGravity.END -> {
-                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                LayoutParams(packedWidth, LayoutParams.WRAP_CONTENT).apply {
                     gravity = Gravity.END
                 }
             }

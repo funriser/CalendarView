@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="month_header_packed_width">215dp</dimen>
+</resources>
