@@ -23,7 +23,7 @@ allprojects {
 Step 2. Add the dependency to your module-level build.gradle:
 ```gradle
 dependencies {
-    implementation 'com.github.funriser:CalendarView:v0.1.0'
+    implementation 'com.github.funriser:CalendarView:0.2.8-alpha'
 }
 ```
 ## How to use?
